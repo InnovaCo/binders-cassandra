@@ -7,16 +7,15 @@ import eu.inn.binders._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar.mock
 
+
 class TestRowSpec extends FlatSpec with Matchers {
 
-  def fixture = new {
-    val (yesterday,now) = {
-      import java.util._
-      val cal = Calendar.getInstance()
-      cal.setTime(new Date())
-      cal.add(Calendar.DATE, -11)
-      (cal.getTime(), new Date())
-    }
+  val (yesterday,now) = {
+    import java.util._
+    val cal = Calendar.getInstance()
+    cal.setTime(new Date())
+    cal.add(Calendar.DATE, -11)
+    (cal.getTime(), new Date())
   }
 
   case class TestInt(i1: Int, i2: Option[Int], i3: Option[Int])
@@ -74,15 +73,15 @@ class TestRowSpec extends FlatSpec with Matchers {
   "Row " should " unbind date fields " in {
     val cr = mock[com.datastax.driver.core.Row]
     when(cr.isNull("i1")).thenReturn(false)
-    when(cr.getDate("i1")).thenReturn(fixture.yesterday)
+    when(cr.getDate("i1")).thenReturn(yesterday)
     when(cr.isNull("i2")).thenReturn(false)
-    when(cr.getDate("i2")).thenReturn(fixture.now)
+    when(cr.getDate("i2")).thenReturn(now)
     when(cr.isNull("i3")).thenReturn(true)
     when(cr.getDate("i3")).thenReturn(null)
 
     val br = new eu.inn.binders.cassandra.Row(cr)
     val t = br.unbind[TestDate]
-    assert (t == TestDate(fixture.yesterday, Some(fixture.now), None))
+    assert (t == TestDate(yesterday, Some(now), None))
   }
 
   case class TestBoolean(i1: Boolean, i2: Option[Boolean], i3: Option[Boolean])
@@ -119,7 +118,7 @@ class TestRowSpec extends FlatSpec with Matchers {
 
   case class TestDouble(i1: Double, i2: Option[Double], i3: Option[Double])
 
-  "Row " should " unbind float fields " in {
+  "Row " should " unbind double fields " in {
     val cr = mock[com.datastax.driver.core.Row]
     when(cr.isNull("i1")).thenReturn(false)
     when(cr.getDouble("i1")).thenReturn(1.0)
@@ -201,7 +200,7 @@ class TestRowSpec extends FlatSpec with Matchers {
 
   case class TestInetAddress(i1: InetAddress, i2: Option[InetAddress], i3: Option[InetAddress])
 
-  "Row " should " unbind UUID fields " in {
+  "Row " should " unbind InetAddress fields " in {
     val cr = mock[com.datastax.driver.core.Row]
     when(cr.isNull("i1")).thenReturn(false)
     when(cr.getInet("i1")).thenReturn(InetAddress.getLocalHost)
@@ -221,49 +220,51 @@ class TestRowSpec extends FlatSpec with Matchers {
     import scala.collection.JavaConversions._
 
     val cr = mock[com.datastax.driver.core.Row]
+    val br = new eu.inn.binders.cassandra.Row(cr)
+
     when(cr.isNull("i1")).thenReturn(false)
     when(cr.getList[Int]("i1", classOf[Int])).thenReturn(List(1,2,3))
     when(cr.isNull("i2")).thenReturn(false)
-    when(cr.getList[String]("i1", classOf[String])).thenReturn(List("1","2","3"))
+    when(cr.getList[String]("i2", classOf[String])).thenReturn(List("1","2","3"))
     when(cr.isNull("i3")).thenReturn(true)
-    when(cr.getList[Date]("i1", classOf[Date])).thenReturn(List(fixture.yesterday,fixture.now))
+    when(cr.getList[Date]("i3", classOf[Date])).thenReturn(List(yesterday,now))
 
-    val br = new eu.inn.binders.cassandra.Row(cr)
     val t = br.unbind[TestList]
-    assert (t == TestList(List(1,2,3), List("1","2","3"), List(fixture.yesterday,fixture.now)))
+    assert (t == TestList(List(1,2,3), List("1","2","3"), List(yesterday,now)))
   }
 
   case class TestSet(i1: Set[Int], i2: Set[String], i3: Set[Date])
 
-  "Row " should " unbind list fields " in {
+  "Row " should " unbind set fields " in {
     import scala.collection.JavaConversions._
 
     val cr = mock[com.datastax.driver.core.Row]
     when(cr.isNull("i1")).thenReturn(false)
     when(cr.getSet[Int]("i1", classOf[Int])).thenReturn(Set(1,2,3))
     when(cr.isNull("i2")).thenReturn(false)
-    when(cr.getSet[String]("i1", classOf[String])).thenReturn(Set("1","2","3"))
+    when(cr.getSet[String]("i2", classOf[String])).thenReturn(Set("1","2","3"))
     when(cr.isNull("i3")).thenReturn(false)
-    when(cr.getSet[Date]("i1", classOf[Date])).thenReturn(Set(fixture.yesterday,fixture.now))
+    when(cr.getSet[Date]("i3", classOf[Date])).thenReturn(Set(yesterday,now))
 
     val br = new eu.inn.binders.cassandra.Row(cr)
     val t = br.unbind[TestSet]
-    assert (t == TestSet(Set(1,2,3), Set("1","2","3"), Set(fixture.yesterday,fixture.now)))
+    assert (t == TestSet(Set(1,2,3), Set("1","2","3"), Set(yesterday,now)))
   }
 
   case class TestMap(i1: Map[Int, String], i2: Map[Long, Date])
 
-  "Row " should " unbind list fields " in {
+  "Row " should " unbind map fields " in {
     import scala.collection.JavaConversions._
 
     val cr = mock[com.datastax.driver.core.Row]
     when(cr.isNull("i1")).thenReturn(false)
     when(cr.getMap[Int, String]("i1", classOf[Int], classOf[String])).thenReturn(Map(1->"11", 2->"22"))
     when(cr.isNull("i2")).thenReturn(false)
-    when(cr.getMap[Long, Date]("i1", classOf[Long], classOf[Date])).thenReturn(Map(0l -> fixture.yesterday, 1l -> fixture.now))
+    when(cr.getMap[Long, Date]("i2", classOf[Long], classOf[Date])).thenReturn(Map(0l -> yesterday, 1l -> now))
 
     val br = new eu.inn.binders.cassandra.Row(cr)
     val t = br.unbind[TestMap]
-    assert (t == TestMap(Map(1->"11", 2->"22"), Map(0l -> fixture.yesterday, 1l -> fixture.now)))
+    assert (t == TestMap(Map(1->"11", 2->"22"), Map(0l -> yesterday, 1l -> now)))
   }
+
 }
