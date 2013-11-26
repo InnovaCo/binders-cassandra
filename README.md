@@ -1,6 +1,6 @@
 # binders-cassandra
 
-This is a data binder library for Cassandra written in Scala. Please see more information at [binders library page](/InnovaCo/binders)
+This is a data binder library for Cassandra written in Scala. Please see more information at [binders library page](https://github.com/InnovaCo/binders)
 
 Cassandra data using [DataStax Java Driver for Cassandra](https://github.com/datastax/java-driver).
 
@@ -23,3 +23,7 @@ Currently tested and works only with:
 * Cassandra 2.0.1 (corresponding driver with prepared statements)
 * Scala 2.10
 * sbt 0.13
+
+## License
+
+Product licensed under BSD 3-clause as stated in file LICENSE
