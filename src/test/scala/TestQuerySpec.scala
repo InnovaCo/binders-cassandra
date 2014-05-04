@@ -1,7 +1,5 @@
 import eu.inn.binders.cassandra.Query
-import org.scalatest.mock.MockitoSugar.mock
 import org.scalatest.{FlatSpec,Matchers}
-import org.mockito.Mockito._
 import eu.inn.binders._
 import com.datastax.driver.core.{Session, Cluster, Row, BoundStatement}
 
