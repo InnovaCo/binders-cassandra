@@ -1,7 +1,7 @@
 import eu.inn.binders.cassandra.Query
-import org.scalatest.{FlatSpec,Matchers}
+import org.scalatest.{FlatSpec, Matchers}
 import eu.inn.binders._
-import com.datastax.driver.core.{Session, Cluster, Row, BoundStatement}
+import com.datastax.driver.core.Cluster
 
 class TestQuerySpec extends FlatSpec with Matchers {
 

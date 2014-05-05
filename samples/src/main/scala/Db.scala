@@ -2,6 +2,7 @@ import eu.inn.binders._
 import eu.inn.binders.cassandra._
 
 class Db(session: com.datastax.driver.core.Session) {
+
   // class for binding input/output parameters
   case class User(userId: Int, name: String)
 

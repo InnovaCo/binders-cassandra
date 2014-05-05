@@ -2,14 +2,14 @@ import java.math.BigInteger
 import java.net.InetAddress
 import java.nio.ByteBuffer
 import java.util.{UUID, Date}
-import org.scalatest.{FlatSpec,Matchers}
+import org.scalatest.{FlatSpec, Matchers}
 import eu.inn.binders._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar.mock
 
 class TestStatementSpec extends FlatSpec with Matchers {
 
-  val (yesterday,now) = {
+  val (yesterday, now) = {
     import java.util._
     val cal = Calendar.getInstance()
     cal.setTime(new Date())
@@ -207,10 +207,10 @@ class TestStatementSpec extends FlatSpec with Matchers {
   "Row " should " bind ByteBuffer fields " in {
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement(cr)
-    br.bind(0, TestBytes(ByteBuffer.wrap(Array[Byte](1,2,3)), Some(ByteBuffer.wrap(Array[Byte](5,6,7))), None))
+    br.bind(0, TestBytes(ByteBuffer.wrap(Array[Byte](1, 2, 3)), Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))), None))
 
-    verify(cr).setBytes("i1", ByteBuffer.wrap(Array[Byte](1,2,3)))
-    verify(cr).setBytes("i2", ByteBuffer.wrap(Array[Byte](5,6,7)))
+    verify(cr).setBytes("i1", ByteBuffer.wrap(Array[Byte](1, 2, 3)))
+    verify(cr).setBytes("i2", ByteBuffer.wrap(Array[Byte](5, 6, 7)))
     verify(cr).setBytes("i3", null)
     verifyNoMoreInteractions(cr)
   }
@@ -218,12 +218,12 @@ class TestStatementSpec extends FlatSpec with Matchers {
   "Row " should " bind ByteBuffer parameters " in {
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement(cr)
-    br.bind(0, ByteBuffer.wrap(Array[Byte](1,2,3)))
-    br.bind(1, Some(ByteBuffer.wrap(Array[Byte](5,6,7))))
+    br.bind(0, ByteBuffer.wrap(Array[Byte](1, 2, 3)))
+    br.bind(1, Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))))
     br.bind(2, null.asInstanceOf[ByteBuffer])
 
-    verify(cr).setBytes(0, ByteBuffer.wrap(Array[Byte](1,2,3)))
-    verify(cr).setBytes(1, ByteBuffer.wrap(Array[Byte](5,6,7)))
+    verify(cr).setBytes(0, ByteBuffer.wrap(Array[Byte](1, 2, 3)))
+    verify(cr).setBytes(1, ByteBuffer.wrap(Array[Byte](5, 6, 7)))
     verify(cr).setBytes(2, null)
     verifyNoMoreInteractions(cr)
   }
@@ -275,7 +275,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     br.bind(2, None.asInstanceOf[Option[BigDecimal]])
 
     verify(cr).setDecimal(0, BigDecimal("123").bigDecimal)
-    verify(cr).setDecimal(1,  BigDecimal("567").bigDecimal)
+    verify(cr).setDecimal(1, BigDecimal("567").bigDecimal)
     verify(cr).setDecimal(2, null)
     verifyNoMoreInteractions(cr)
   }
@@ -341,9 +341,9 @@ class TestStatementSpec extends FlatSpec with Matchers {
   "Row " should " bind list fields " in {
     import scala.collection.JavaConversions._
 
-    val lst1 = List(1,2,3)
-    val lst2 = List("1","2","3")
-    val lst3 = List(yesterday,now)
+    val lst1 = List(1, 2, 3)
+    val lst2 = List("1", "2", "3")
+    val lst3 = List(yesterday, now)
 
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement(cr)
@@ -361,9 +361,9 @@ class TestStatementSpec extends FlatSpec with Matchers {
   "Row " should " unbind set fields " in {
     import scala.collection.JavaConversions._
 
-    val set1 = Set(1,2,3)
-    val set2 = Set("1","2","3")
-    val set3 = Set(yesterday,now)
+    val set1 = Set(1, 2, 3)
+    val set2 = Set("1", "2", "3")
+    val set3 = Set(yesterday, now)
 
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement(cr)
@@ -380,7 +380,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
   "Row " should " unbind map fields " in {
     import scala.collection.JavaConversions._
 
-    val map1 = Map(1->"11", 2->"22")
+    val map1 = Map(1 -> "11", 2 -> "22")
     val map2 = Map(0l -> yesterday, 1l -> now)
 
     val cr = mock[com.datastax.driver.core.BoundStatement]

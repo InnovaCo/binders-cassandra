@@ -2,7 +2,7 @@ import com.datastax.driver.core.Cluster
 
 object Sample {
 
-	def main(args: Array[String]) {
+  def main(args: Array[String]) {
     val cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
     val session = cluster.connect("capickling_tests")
 
@@ -14,5 +14,5 @@ object Sample {
     println(users)
 
     cluster.shutdown()
-	}
+  }
 }
