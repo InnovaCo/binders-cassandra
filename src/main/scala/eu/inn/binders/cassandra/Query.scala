@@ -1,15 +1,12 @@
 package eu.inn.binders.cassandra
 
-import com.datastax.driver.core.{BoundStatement, Session}
+import com.datastax.driver.core.{PreparedStatement, BoundStatement, Session}
 
 
-class Query(val session: Session, val queryString: String) extends eu.inn.binders.core.Query[Rows, Statement]{
-  val preparedStatement = session.prepare(queryString)
+class Query(val session: Session, val preparedStatement: PreparedStatement) extends eu.inn.binders.core.Query[Rows, Statement]{
+  def this (session: Session, queryString: String) = this(session, session.prepare(queryString))
 
-  def bindAndExecute(f: (Statement) => Unit): Rows = {
-    val boundStatement = new BoundStatement(preparedStatement)
-    val statement = new Statement(boundStatement)
-    f(statement)
-    new Rows(session.execute(boundStatement))
-  }
+  override def executeStatement(statement: Statement): Rows = new Rows(session.execute(statement.boundStatement))
+
+  override def createStatement(): Statement = new Statement(new BoundStatement(preparedStatement))
 }

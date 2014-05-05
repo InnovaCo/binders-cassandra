@@ -14,7 +14,7 @@ libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % "test"
 
 libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.1"
 
-libraryDependencies += "eu.inn" %% "binders-core" % "0.1.1"
+libraryDependencies += "eu.inn" %% "binders-core" % "0.2.0"
 
 // Sonatype repositary publish options
 publishMavenStyle := true
