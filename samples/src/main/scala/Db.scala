@@ -1,23 +1,21 @@
 import eu.inn.binders._
 import eu.inn.binders.cassandra._
+import scala.concurrent.ExecutionContext
 
 class Db(session: com.datastax.driver.core.Session) {
+  import ExecutionContext.Implicits.global
+  implicit val cache = new SessionQueryCache(session)
 
   // class for binding input/output parameters
   case class User(userId: Int, name: String)
 
-  lazy val insertStatement = new Query(session,
-    "insert into users(userid, name) values (?, ?)")
+  def insertUser(user: User) = CQL("insert into users(userid, name) values (?, ?)").execute(user)
 
-  def insertUser(user: User) = insertStatement.execute(user)
+  def selectAllUsers = CQL("select * from users")
+    .execute()
+    .map(_.unbindAll[User])
 
-  lazy val selectAllStatement = new Query(session,
-    "select * from users")
-
-  def selectAllUsers = selectAllStatement.execute().unbindAll[User]
-
-  lazy val selectUserStatement = new Query(session,
-    "select * from users where userId = ?")
-
-  def selectUser(userId: Int) = selectUserStatement.execute(userId).unbindOne[User]
+  def selectUser(userId: Int) = CQL("select * from users where userId = ?")
+    .execute(userId)
+    .map(_.unbindOne[User])
 }

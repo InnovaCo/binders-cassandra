@@ -5,8 +5,11 @@ import java.nio.ByteBuffer
 import java.math.BigInteger
 import java.util.UUID
 import java.net.InetAddress
+import eu.inn.binders.naming.Converter
+import scala.reflect.runtime.universe._
 
-class Row(row: com.datastax.driver.core.Row) extends eu.inn.binders.core.Row {
+class Row[C <: Converter: TypeTag](row: com.datastax.driver.core.Row) extends eu.inn.binders.core.Row {
+  type nameConverterType = C
 
   import scala.reflect._
   import scala.collection.JavaConversions._

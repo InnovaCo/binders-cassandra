@@ -6,9 +6,11 @@ import java.nio.ByteBuffer
 import java.math.BigInteger
 import java.net.InetAddress
 import scala.reflect.ClassTag
+import eu.inn.binders.naming.Converter
+import scala.reflect.runtime.universe._
 
-
-class Statement(val boundStatement: BoundStatement) extends eu.inn.binders.core.Statement {
+class Statement[C <: Converter: TypeTag](val boundStatement: BoundStatement) extends eu.inn.binders.core.Statement {
+  type nameConverterType = C
 
   import scala.collection.JavaConversions._
 

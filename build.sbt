@@ -1,6 +1,6 @@
 name := "binders-cassandra"
 
-version := "0.1.1"
+version := "0.2.0"
 
 organization := "eu.inn"
 
@@ -15,6 +15,10 @@ libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % "test"
 libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.1"
 
 libraryDependencies += "eu.inn" %% "binders-core" % "0.2.0"
+
+libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
+
+libraryDependencies += "com.google.guava" % "guava" % "16.0.1"
 
 // Sonatype repositary publish options
 publishMavenStyle := true
