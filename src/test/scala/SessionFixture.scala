@@ -5,7 +5,8 @@ import eu.inn.binders.cassandra._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-trait SessionFixture extends BeforeAndAfter { this: Suite =>
+trait SessionFixture extends BeforeAndAfter {
+  this: Suite =>
   var cluster: Cluster = null
   var session: Session = null
   implicit var sessionQueryCache: SessionQueryCache[PlainConverter] = null

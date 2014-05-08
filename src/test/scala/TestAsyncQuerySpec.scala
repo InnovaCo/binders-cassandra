@@ -1,7 +1,6 @@
 import eu.inn.binders.cassandra.AsyncQuery
 import eu.inn.binders.naming.PlainConverter
-import org.scalatest.{BeforeAndAfterEach, BeforeAndAfter, FlatSpec, Matchers}
-import com.datastax.driver.core.{Session, Cluster}
+import org.scalatest.{FlatSpec, Matchers}
 import scala.concurrent._
 import scala.concurrent.duration._
 

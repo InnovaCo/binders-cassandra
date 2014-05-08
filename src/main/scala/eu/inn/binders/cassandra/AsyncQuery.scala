@@ -7,7 +7,7 @@ import eu.inn.binders.naming.Converter
 import scala.reflect.runtime.universe._
 
 
-class AsyncQuery[C <: Converter: TypeTag](val session: Session, val preparedStatement: PreparedStatement) extends eu.inn.binders.core.Query[Future[Rows[C]], Statement[C]] {
+class AsyncQuery[C <: Converter : TypeTag](val session: Session, val preparedStatement: PreparedStatement) extends eu.inn.binders.core.Query[Future[Rows[C]], Statement[C]] {
   //type C = C
 
   def this(session: Session, queryString: String) = this(session, session.prepare(queryString))

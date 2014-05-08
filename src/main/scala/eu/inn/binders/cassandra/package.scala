@@ -3,6 +3,7 @@ package eu.inn.binders
 import com.datastax.driver.core.{Cluster, Session}
 
 package object cassandra {
+
   implicit class SessionHelper(val session: Session) {
     def safeClose(): Unit = {
       if (session != null)
@@ -16,4 +17,5 @@ package object cassandra {
         cluster.close()
     }
   }
+
 }

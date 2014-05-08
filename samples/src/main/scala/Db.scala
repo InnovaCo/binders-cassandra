@@ -3,7 +3,9 @@ import eu.inn.binders.cassandra._
 import scala.concurrent.ExecutionContext
 
 class Db(session: com.datastax.driver.core.Session) {
+
   import ExecutionContext.Implicits.global
+
   implicit val cache = new SessionQueryCache(session)
 
   // class for binding input/output parameters

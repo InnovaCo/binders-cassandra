@@ -18,4 +18,5 @@ class SessionQueryCache[C <: Converter : TypeTag](val session: Session) {
   private class Loader(query: String) extends Callable[AsyncQuery[nameConverterType]] {
     override def call(): AsyncQuery[nameConverterType] = new AsyncQuery[nameConverterType](session, query)
   }
+
 }

@@ -13,19 +13,19 @@ class TestQuerySpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "Query " should " be able to execute with parameters " in {
-    
+
     val stmt = new Query[PlainConverter](session, "delete from users where userid=?")
     stmt.execute(12)
   }
 
   "Query " should " be able to execute with 2 primitive parameters " in {
-    
+
     val stmt = new Query[PlainConverter](session, "delete from users where userid in(?,?)")
     stmt.execute(12, 13)
   }
 
   "Query " should " be able to select one row " in {
-    
+
     val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid=10")
     val user = stmt.execute().unbindOne[User]
 
@@ -36,7 +36,7 @@ class TestQuerySpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "Query " should " be able to select one row with parameters " in {
-    
+
     val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid=?")
     val user = stmt.execute(11).unbindOne[User]
 
@@ -47,14 +47,14 @@ class TestQuerySpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "Query " should " be able to select two rows with 2 plain parameters " in {
-    
+
     val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid in(?,?)")
     val users = stmt.execute(10, 11).unbindAll[User].toSeq
     assert(users.length == 2)
   }
 
   "Query " should " be able to select rows " in {
-    
+
     val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid in (10,11)")
     val users = stmt.execute().unbindAll[User]
 
@@ -62,7 +62,7 @@ class TestQuerySpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "Query " should " be able to select 0 rows " in {
-    
+
     val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid in (12,13)")
     val users = stmt.execute().unbindAll[User]
 
