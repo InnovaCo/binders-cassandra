@@ -1,21 +1,12 @@
 package eu.inn.binders
 
-import com.datastax.driver.core.{Cluster, Session}
+import eu.inn.binders.cassandra.internal.CqlMacro
+import language.experimental.macros
+import eu.inn.binders.naming.Converter
+import scala.concurrent.Future
 
 package object cassandra {
-
-  implicit class SessionHelper(val session: Session) {
-    def safeClose(): Unit = {
-      if (session != null)
-        session.close()
-    }
+  implicit class CqlContext(val sc: StringContext) {
+    def cql[C <: Converter](args: Any *)(implicit sessionQueryCache: SessionQueryCache[C]) = macro CqlMacro.cql[C]
   }
-
-  implicit class ClusterHelper(val cluster: Cluster) {
-    def safeClose(): Unit = {
-      if (cluster != null)
-        cluster.close()
-    }
-  }
-
 }

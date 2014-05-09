@@ -9,5 +9,5 @@ class Rows[C <: Converter : TypeTag](resultSet: ResultSet) extends eu.inn.binder
 
   import scala.collection.JavaConversions._
 
-  def iterator: Iterator[Row[C]] = resultSet.iterator().map(r => new Row[C](r))
+  def iterator(): Iterator[Row[C]] = resultSet.iterator().map(r => new Row[C](r))
 }

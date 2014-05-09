@@ -1,6 +1,6 @@
 package eu.inn.binders.cassandra
 
-import com.datastax.driver.core.BoundStatement
+import com.datastax.driver.core.{ResultSet, Session, BoundStatement}
 import java.util.{UUID, Date}
 import java.nio.ByteBuffer
 import java.math.BigInteger
@@ -8,11 +8,28 @@ import java.net.InetAddress
 import scala.reflect.ClassTag
 import eu.inn.binders.naming.Converter
 import scala.reflect.runtime.universe._
+import scala.concurrent.{Promise, Future}
+import com.google.common.util.concurrent.{FutureCallback, Futures}
 
-class Statement[C <: Converter : TypeTag](val boundStatement: BoundStatement) extends eu.inn.binders.core.Statement {
+class Statement[C <: Converter : TypeTag](val session: Session, val boundStatement: BoundStatement)
+  extends eu.inn.binders.core.Statement[Future[Rows[C]]] {
   type nameConverterType = C
 
   import scala.collection.JavaConversions._
+
+  override def executeStatement(): Future[Rows[C]] = {
+    val futureResult = session.executeAsync(boundStatement)
+    val promise = Promise[Rows[C]]
+    val futureConverter = new FutureConverter(promise)
+    Futures.addCallback(futureResult, futureConverter)
+    promise.future
+  }
+
+  private class FutureConverter(promise: Promise[Rows[C]]) extends FutureCallback[ResultSet] {
+    override def onFailure(t: Throwable): Unit = promise.failure(t)
+
+    override def onSuccess(result: ResultSet): Unit = promise.success(new Rows(result))
+  }
 
   def hasParameter(parameterName: String): Boolean = boundStatement.preparedStatement().getVariables.contains(parameterName)
 
