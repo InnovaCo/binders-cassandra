@@ -1,8 +1,6 @@
 package eu.inn.binders.cassandra
 
-import com.datastax.driver.core.{PreparedStatement, ResultSet, BoundStatement, Session}
-import scala.concurrent.{Promise, Future}
-import com.google.common.util.concurrent.{FutureCallback, Futures}
+import com.datastax.driver.core.{PreparedStatement, BoundStatement, Session}
 import eu.inn.binders.naming.Converter
 import scala.reflect.runtime.universe._
 
@@ -12,5 +10,5 @@ class Query[C <: Converter : TypeTag](val session: Session, val preparedStatemen
 
   def this(session: Session, queryString: String) = this(session, session.prepare(queryString))
 
-  override def createStatement(): Statement[C] = new Statement[C](session, new BoundStatement(preparedStatement))
+  override def createStatement: Statement[C] = new Statement[C](session, new BoundStatement(preparedStatement))
 }

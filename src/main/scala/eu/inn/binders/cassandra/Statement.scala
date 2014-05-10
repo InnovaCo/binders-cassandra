@@ -17,7 +17,7 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
 
   import scala.collection.JavaConversions._
 
-  override def executeStatement(): Future[Rows[C]] = {
+  override def execute(): Future[Rows[C]] = {
     val futureResult = session.executeAsync(boundStatement)
     val promise = Promise[Rows[C]]
     val futureConverter = new FutureConverter(promise)

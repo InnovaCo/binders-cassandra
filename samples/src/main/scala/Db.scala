@@ -14,7 +14,7 @@ class Db(session: com.datastax.driver.core.Session) {
   def insertUser(user: User) = Cql("insert into users(userid, name) values (?, ?)").execute(user)
 
   def selectAllUsers = Cql("select * from users")
-    .execute()
+    .execute
     .map(_.unbindAll[User])
 
   def selectUser(userId: Int) = Cql("select * from users where userId = ?")

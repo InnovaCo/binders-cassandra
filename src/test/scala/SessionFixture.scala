@@ -17,10 +17,14 @@ trait SessionFixture extends BeforeAndAfter {
     val cal = Calendar.getInstance()
     cal.setTime(new Date())
     cal.add(Calendar.DATE, -11)
-    cal.getTime()
+    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.MINUTE, 0)
+    cal.set(Calendar.SECOND, 0)
+    cal.set(Calendar.MILLISECOND, 0)
+    cal.getTime
   }
 
-  def createUser(id: Int, name: String, created: Date) = await(cql"insert into users(userId, name, created) values ($id,$name,$created)".executeStatement())
+  def createUser(id: Int, name: String, created: Date) = await(cql"insert into users(userId, name, created) values ($id,$name,$created)".execute)
 
   before {
     cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
@@ -44,5 +48,5 @@ trait SessionFixture extends BeforeAndAfter {
   }
 
   import scala.reflect.runtime.universe._
-  def await[C <: Converter : TypeTag](r: Future[Rows[C]]): Rows[C] = Await.result(r, 20 seconds)
+  def await[R : TypeTag](r: Future[R]): R = Await.result(r, 20 seconds)
 }
