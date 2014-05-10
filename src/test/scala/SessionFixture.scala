@@ -1,5 +1,5 @@
 import com.datastax.driver.core.{Session, Cluster}
-import eu.inn.binders.naming.{Converter, PlainConverter}
+import eu.inn.binders.naming.PlainConverter
 import java.util.Date
 import org.scalatest.{Suite, BeforeAndAfter}
 import eu.inn.binders.cassandra._
@@ -31,16 +31,16 @@ trait SessionFixture extends BeforeAndAfter {
     session = cluster.connect("binder_test")
     sessionQueryCache = new SessionQueryCache[PlainConverter](session)
 
-    createUser(10,"maga",yesterday)
-    createUser(11,"alla",yesterday)
+    createUser(10, "maga", yesterday)
+    createUser(11, "alla", yesterday)
   }
 
   after {
-    if (session != null){
+    if (session != null) {
       session.close()
       session = null
     }
-    if (cluster != null){
+    if (cluster != null) {
       cluster.close()
       cluster = null
     }
@@ -48,5 +48,6 @@ trait SessionFixture extends BeforeAndAfter {
   }
 
   import scala.reflect.runtime.universe._
-  def await[R : TypeTag](r: Future[R]): R = Await.result(r, 20 seconds)
+
+  def await[R: TypeTag](r: Future[R]): R = Await.result(r, 20 seconds)
 }

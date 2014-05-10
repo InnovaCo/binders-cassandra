@@ -9,12 +9,14 @@ object Sample {
     val session = cluster.connect("binder_test")
 
     val db = new Db(session)
-    Await.result(db.insertUser(db.User(10, "John")), 10 seconds)
+
+    Await.result(db.insertUser(db.User(9, "John")), 10 seconds)
 
     val users = Await.result(db.selectAllUsers, 10 seconds)
 
     println(users.toList)
 
+    session.close()
     cluster.close()
   }
 }

@@ -1,16 +1,18 @@
 import eu.inn.binders.cassandra.{NoRowsSelectedException, CqlContext}
-import eu.inn.binders.naming.{PlainConverter, Converter}
+import eu.inn.binders.naming.PlainConverter
 import org.scalatest.{FlatSpec, Matchers}
 import scala.concurrent.{Future, ExecutionContext}
 import scala.concurrent.duration._
 
 
 class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
+
   import ExecutionContext.Implicits.global
+
   case class User(userId: Int, name: String, created: java.util.Date)
 
   "cql...one " should " select one row with parameters " in {
-    val userId=11
+    val userId = 11
     val user =
       await(cql"select userId,name,created from users where userid=$userId".one[User])
 
@@ -20,12 +22,13 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   def selectUser(userId: Int) = cql"select userId,name,created from users where userid=$userId".one[User]
+
   "cql...one " should " select one row with parameters (2)" in {
     val user = await(selectUser(11))
   }
 
   "cql...oneOption " should " return Some() if if row is found" in {
-    val userId=11
+    val userId = 11
     val user =
       await(cql"select userId,name,created from users where userid=$userId".oneOption[User])
 
@@ -36,7 +39,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "cql...oneOption " should " return None if no rows were found" in {
-    val userId=111
+    val userId = 111
     val userO =
       await(cql"select userId,name,created from users where userid=$userId".oneOption[User])
 
@@ -44,8 +47,8 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "cql...all " should " be able to select rows " in {
-    val userId1=10
-    val userId2=11
+    val userId1 = 10
+    val userId2 = 11
     val users = await(
       cql"select userId,name,created from users where userid in ($userId1,$userId2)".all[User]
     )
@@ -53,14 +56,14 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "cql...one " should " throw NoRowsSelectedException if there were no rows selected " in {
-    val userId=111
+    val userId = 111
     intercept[NoRowsSelectedException] {
       await(cql"select userId,name,created from users where userid=$userId".one[User])
     }
   }
 
   "Query " should " be able to execute command with StringContext parameters" in {
-    val userId=12
+    val userId = 12
     await(cql"delete from users where userid=$userId".execute)
   }
 
@@ -68,13 +71,14 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     await(cql"delete from users where userid=12".execute)
   }
 
-  def testImplicitFutureConvertToUnit(userId:Int): Future[Unit] = cql"delete from users where userid=$userId".execute
+  def testImplicitFutureConvertToUnit(userId: Int): Future[Unit] = cql"delete from users where userid=$userId".execute
+
   "cql...execute " should " be able to execute command and convert Future[Rows[_]] to Future[Unit[_]]" in {
     await(testImplicitFutureConvertToUnit(12))
   }
 
   "Query " should " be able to execute with parameters " in {
-    await(cql"delete from users where userid=?".bindParameter(0,12).execute)
+    await(cql"delete from users where userid=?".bindParameter(0, 12).execute)
   }
 
   "Query " should " be able to execute with 2 primitive parameters " in {

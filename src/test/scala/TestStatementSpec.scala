@@ -24,7 +24,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val s = mock[com.datastax.driver.core.Session]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestInt(10, Some(20), None))
+    br.bind(TestInt(10, Some(20), None))
 
     verify(cr).setInt("i1", 10)
     verify(cr).setInt("i2", 20)
@@ -52,7 +52,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestLong(10l, Some(20l), None))
+    br.bind(TestLong(10l, Some(20l), None))
 
     verify(cr).setLong("i1", 10)
     verify(cr).setLong("i2", 20)
@@ -80,7 +80,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestString("10", Some("20"), None, Some(null)))
+    br.bind(TestString("10", Some("20"), None, Some(null)))
 
     verify(cr).setString("i1", "10")
     verify(cr).setString("i2", "20")
@@ -111,7 +111,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestDate(yesterday, Some(now), None))
+    br.bind(TestDate(yesterday, Some(now), None))
 
     verify(cr).setDate("i1", yesterday)
     verify(cr).setDate("i2", now)
@@ -139,7 +139,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestBoolean(true, Some(false), None))
+    br.bind(TestBoolean(true, Some(false), None))
 
     verify(cr).setBool("i1", true)
     verify(cr).setBool("i2", false)
@@ -167,7 +167,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestFloat(1.0f, Some(2.0f), None))
+    br.bind(TestFloat(1.0f, Some(2.0f), None))
 
     verify(cr).setFloat("i1", 1.0f)
     verify(cr).setFloat("i2", 2.0f)
@@ -195,7 +195,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestDouble(1.0, Some(2.0), None))
+    br.bind(TestDouble(1.0, Some(2.0), None))
 
     verify(cr).setDouble("i1", 1.0)
     verify(cr).setDouble("i2", 2.0)
@@ -223,7 +223,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestBytes(ByteBuffer.wrap(Array[Byte](1, 2, 3)), Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))), None))
+    br.bind(TestBytes(ByteBuffer.wrap(Array[Byte](1, 2, 3)), Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))), None))
 
     verify(cr).setBytes("i1", ByteBuffer.wrap(Array[Byte](1, 2, 3)))
     verify(cr).setBytes("i2", ByteBuffer.wrap(Array[Byte](5, 6, 7)))
@@ -251,7 +251,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestBigInteger(new BigInteger("123"), Some(new BigInteger("567")), None))
+    br.bind(TestBigInteger(new BigInteger("123"), Some(new BigInteger("567")), None))
 
     verify(cr).setVarint("i1", new BigInteger("123"))
     verify(cr).setVarint("i2", new BigInteger("567"))
@@ -279,7 +279,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestBigDecimal(BigDecimal("123"), Some(BigDecimal("567")), None))
+    br.bind(TestBigDecimal(BigDecimal("123"), Some(BigDecimal("567")), None))
 
     verify(cr).setDecimal("i1", BigDecimal("123").bigDecimal)
     verify(cr).setDecimal("i2", BigDecimal("567").bigDecimal)
@@ -309,7 +309,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestUUID(uuid1, Some(uuid2), None))
+    br.bind(TestUUID(uuid1, Some(uuid2), None))
 
     verify(cr).setUUID("i1", uuid1)
     verify(cr).setUUID("i2", uuid2)
@@ -339,7 +339,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestInetAddress(InetAddress.getLocalHost, Some(InetAddress.getLoopbackAddress), None))
+    br.bind(TestInetAddress(InetAddress.getLocalHost, Some(InetAddress.getLoopbackAddress), None))
 
     verify(cr).setInet("i1", InetAddress.getLocalHost)
     verify(cr).setInet("i2", InetAddress.getLoopbackAddress)
@@ -374,7 +374,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
 
-    br.bindClass(TestList(lst1, lst2, lst3))
+    br.bind(TestList(lst1, lst2, lst3))
 
     verify(cr).setList("i1", lst1)
     verify(cr).setList("i2", lst2)
@@ -394,7 +394,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestSet(set1, set2, set3))
+    br.bind(TestSet(set1, set2, set3))
 
     verify(cr).setSet("i1", set1)
     verify(cr).setSet("i2", set2)
@@ -413,7 +413,7 @@ class TestStatementSpec extends FlatSpec with Matchers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = mock[com.datastax.driver.core.BoundStatement]
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindClass(TestMap(map1, map2))
+    br.bind(TestMap(map1, map2))
 
     verify(cr).setMap("i1", map1)
     verify(cr).setMap("i2", map2)
