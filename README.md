@@ -4,26 +4,57 @@ This is a data binder library for Cassandra written in Scala. Please see more in
 
 Cassandra data using [DataStax Java Driver for Cassandra](https://github.com/datastax/java-driver).
 
-## Compilation    
+## Example
 
-I haven't pushed it into the public artifactory repositaries yet. So it should be used locally. 
+Here is the sample of Scala class that is initialized with Cassandra session and allows you to do select/insert of some user data.
 
-To compile and publish into the local repositary:
-sbt publish-local
+    class Db(session: com.datastax.driver.core.Session) {
 
-Compiled binders also should be in local repositary.
+      import ExecutionContext.Implicits.global
 
-For the unit tests and sample application working local instance of Cassandra is required. Please see schema in db/dbscript.cql
+      implicit val cache = new SessionQueryCache[PlainConverter](session)
+
+      // class for binding input/output parameters
+      case class User(userId: Int, name: String)
+
+      def insertUser(user: User): Future[Unit] = cql"insert into users(userid, name) values (?, ?)".bind(user).execute
+
+      // returns Future[Iterator[User]]
+      def selectAllUsers: Future[Iterator[User]] = cql"select * from users".all[User]
+
+      // if no user is found will throw NoRowsSelectedException
+      def selectUser(userId: Int) = cql"select * from users where userId = $userId".one[User]
+
+      // if no user is found will return None, otherwise Some(User)
+      def selectUserIfFound(userId: Int) = cql"select * from users where userId = $userId".oneOption[User]
+    }
+
+And this class could be used like this:
+
+    val cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
+    val session = cluster.connect("binder_test")
+
+    val db = new Db(session)
+
+    Await.result(db.insertUser(db.User(9, "John")), 10 seconds)
+
+    val users = Await.result(db.selectAllUsers, 10 seconds)
+
+    println(users.toList)
+
+For the unit tests and sample application working local instance of Cassandra is required. Please see also sample project inside `samples/` folder and schema in `db/dbscript.cql`
     
 ## Requirements
 
-Currently tested and works only with:
+Currently tested and works with:
 
-* binders-core
+* binders-core 0.2.0
 * Cassandra 2.0.1 (corresponding driver with prepared statements)
-* Scala 2.10
+* Scala 2.10.3
 * sbt 0.13
 
 ## License
 
 Product licensed under BSD 3-clause as stated in file LICENSE
+
+

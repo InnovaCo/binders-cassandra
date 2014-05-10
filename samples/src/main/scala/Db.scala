@@ -1,22 +1,25 @@
 import eu.inn.binders._
 import eu.inn.binders.cassandra._
+import eu.inn.binders.naming.PlainConverter
+import scala.concurrent.{Future, ExecutionContext}
 
 class Db(session: com.datastax.driver.core.Session) {
+
+  import ExecutionContext.Implicits.global
+
+  implicit val cache = new SessionQueryCache[PlainConverter](session)
+
   // class for binding input/output parameters
   case class User(userId: Int, name: String)
 
-  lazy val insertStatement = new Query(session,
-    "insert into users(userid, name) values (?, ?)")
+  def insertUser(user: User): Future[Unit] = cql"insert into users(userid, name) values (?, ?)".bind(user).execute
 
-  def insertUser(user: User) = insertStatement.execute(user)
+  // returns Future[Iterator[User]]
+  def selectAllUsers: Future[Iterator[User]] = cql"select * from users".all[User]
 
-  lazy val selectAllStatement = new Query(session,
-    "select * from users")
+  // if no user is found will throw NoRowsSelectedException
+  def selectUser(userId: Int) = cql"select * from users where userId = $userId".one[User]
 
-  def selectAllUsers = selectAllStatement.execute().unbindAll[User]
-
-  lazy val selectUserStatement = new Query(session,
-    "select * from users where userId = ?")
-
-  def selectUser(userId: Int) = selectUserStatement.execute(userId).unbindOne[User]
+  // if no user is found will return None, otherwise Some(User)
+  def selectUserIfFound(userId: Int) = cql"select * from users where userId = $userId".oneOption[User]
 }
