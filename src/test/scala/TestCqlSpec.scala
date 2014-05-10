@@ -19,6 +19,11 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     assert(user.created == yesterday)
   }
 
+  def selectUser(userId: Int) = cql"select userId,name,created from users where userid=$userId".one[User]
+  "cql...one " should " select one row with parameters (2)" in {
+    val user = await(selectUser(11))
+  }
+
   "cql...oneOption " should " return Some() if if row is found" in {
     val userId=11
     val user =
