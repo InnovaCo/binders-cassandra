@@ -43,7 +43,13 @@ And this class could be used like this:
     println(users.toList)
 
 For the unit tests and sample application working local instance of Cassandra is required. Please see also sample project inside `samples/` folder and schema in `db/dbscript.cql`
-    
+
+## SBT
+
+To use library, add this line to the build.sbt file:
+
+    libraryDependencies += "eu.inn" %% "binders-cassandra" % "0.2.0"
+
 ## Requirements
 
 Currently tested and works with:
@@ -52,6 +58,7 @@ Currently tested and works with:
 * Cassandra 2.0.1 (corresponding driver with prepared statements)
 * Scala 2.10.3
 * sbt 0.13
+* guava from google 16.0.1
 
 ## License
 
