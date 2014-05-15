@@ -23,4 +23,5 @@ package object cassandra {
   }
 
   implicit def convertFutureToUnit[R <: Rows[_]](f: Future[R])(implicit executor: ExecutionContext): Future[Unit] = f.map(_ ⇒ {})
+  implicit def convertStatement[S <: Statement[_]](stmt: S): com.datastax.driver.core.BoundStatement = stmt.boundStatement
 }

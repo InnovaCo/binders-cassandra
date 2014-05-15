@@ -1,4 +1,6 @@
+import com.datastax.driver.core.BatchStatement
 import eu.inn.binders.cassandra.Query
+import eu.inn.binders.core.Rows
 import eu.inn.binders.naming.PlainConverter
 import org.scalatest.{FlatSpec, Matchers}
 import eu.inn.binders._
@@ -67,6 +69,16 @@ class TestQuerySpec extends FlatSpec with Matchers with SessionFixture {
     val users = await(stmt.execute).unbindAll[User]
 
     assert(users.length == 0)
+  }
+
+  "Batch query " should " execute in batch using prepared statements" in {
+    val stmt1 = new Query[PlainConverter](session, "delete from users where userid=12").createStatement
+    val stmt2 = new Query[PlainConverter](session, "delete from users where userid=13").createStatement
+
+    val bs = new BatchStatement()
+    bs.add(stmt1.boundStatement)
+    bs.add(stmt2.boundStatement)
+    session.execute(bs)
   }
 
   /*

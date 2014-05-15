@@ -1,4 +1,5 @@
-import eu.inn.binders.cassandra.{NoRowsSelectedException, CqlContext}
+import com.datastax.driver.core.BatchStatement
+import eu.inn.binders.cassandra._
 import org.scalatest.{FlatSpec, Matchers}
 import scala.concurrent.{Future, ExecutionContext}
 
@@ -60,12 +61,12 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     }
   }
 
-  "Query " should " be able to execute command with StringContext parameters" in {
+  "cql...execute " should " be able to execute command with StringContext parameters" in {
     val userId = 12
     await(cql"delete from users where userid=$userId".execute)
   }
 
-  "Query " should " be able to execute command " in {
+  "cql...execute " should " be able to execute command " in {
     await(cql"delete from users where userid=12".execute)
   }
 
@@ -75,15 +76,15 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     await(testImplicitFutureConvertToUnit(12))
   }
 
-  "Query " should " be able to execute with parameters " in {
+  "cql...execute " should " be able to execute with parameters " in {
     await(cql"delete from users where userid=?".bindParameter(0, 12).execute)
   }
 
-  "Query " should " be able to execute with 2 primitive parameters " in {
+  "cql...execute " should " be able to execute with 2 primitive parameters " in {
     await(cql"delete from users where userid in(?,?)".bindArgs(12, 13).execute)
   }
 
-  "Query " should " be able to select one row " in {
+  "cql...execute " should " be able to select one row " in {
     val user = await(
       cql"select userId,name,created from users where userid=10".execute
     ).unbindOne[User]
@@ -94,7 +95,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     assert(user.get.created == yesterday)
   }
 
-  "Query " should " be able to select one row with parameters " in {
+  "cql...execute " should " be able to select one row with parameters " in {
     val user = await(
       cql"select userId,name,created from users where userid=?".bindArgs(11).execute
     ).unbindOne[User]
@@ -105,7 +106,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     assert(user.get.created == yesterday)
   }
 
-  "Query " should " be able to select two rows with 2 plain parameters " in {
+  "cql...execute " should " be able to select two rows with 2 plain parameters " in {
     val users = await(
       cql"select userId,name,created from users where userid in(?,?)".bindArgs(10, 11).execute
     ).unbindAll[User]
@@ -113,18 +114,36 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     assert(users.length == 2)
   }
 
-  "Query " should " be able to select rows " in {
+  "cql...execute " should " be able to select rows " in {
     val users = await(
       cql"select userId,name,created from users where userid in (10,11)".execute
     ).unbindAll[User]
     assert(users.length == 2)
   }
 
-  "Query " should " be able to select 0 rows " in {
+  "cql...execute " should " be able to select 0 rows " in {
     val users = await(
       cql"select userId,name,created from users where userid in (12,13)".execute
     ).unbindAll[User]
     assert(users.length == 0)
+  }
+
+  "cql...execute " should " be able to execute with parameters in batch" in {
+    val user1 = 12
+    val user2 = 13
+    val bs = new BatchStatement()
+      .add(cql"delete from users where userid=$user1".boundStatement)
+      .add(cql"delete from users where userid=$user2".boundStatement)
+    session.execute(bs)
+  }
+
+  def deleteStmt(userId: Int) = cql"delete from users where userid=$userId"
+
+  "cql...execute " should " be able to execute methods returning cql with parameters in batch" in {
+    val bs = new BatchStatement()
+      .add(deleteStmt(12))
+      .add(deleteStmt(13))
+    session.execute(bs)
   }
 
   /*
