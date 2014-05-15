@@ -1,15 +1,18 @@
 package eu.inn.binders.cassandra
 
-import com.datastax.driver.core.{ResultSet, Session, BoundStatement}
-import java.util.{UUID, Date}
-import java.nio.ByteBuffer
 import java.math.BigInteger
 import java.net.InetAddress
-import scala.reflect.ClassTag
-import eu.inn.binders.naming.Converter
-import scala.reflect.runtime.universe._
+import java.nio.ByteBuffer
+import java.util.{UUID, Date}
 import scala.concurrent.{Promise, Future}
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
+
+import com.datastax.driver.core.{ResultSet, Session, BoundStatement}
 import com.google.common.util.concurrent.{FutureCallback, Futures}
+
+import eu.inn.binders.naming.Converter
+
 
 class Statement[C <: Converter : TypeTag](val session: Session, val boundStatement: BoundStatement)
   extends eu.inn.binders.core.Statement[Future[Rows[C]]] {
@@ -17,18 +20,20 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
 
   import scala.collection.JavaConversions._
 
-  override def execute(): Future[Rows[C]] = {
-    val futureResult = session.executeAsync(boundStatement)
-    val promise = Promise[Rows[C]]
-    val futureConverter = new FutureConverter(promise)
-    Futures.addCallback(futureResult, futureConverter)
+  override def execute: Future[Rows[C]] = {
+    val promise = Promise[Rows[C]]()
+    Futures.addCallback(session.executeAsync(boundStatement), new FutureConverter(promise))
     promise.future
   }
 
   private class FutureConverter(promise: Promise[Rows[C]]) extends FutureCallback[ResultSet] {
-    override def onFailure(t: Throwable): Unit = promise.failure(t)
+    override def onFailure(t: Throwable) {
+      promise.failure(t)
+    }
 
-    override def onSuccess(result: ResultSet): Unit = promise.success(new Rows(result))
+    override def onSuccess(result: ResultSet) {
+      promise.success(new Rows(result))
+    }
   }
 
   def hasParameter(parameterName: String): Boolean = boundStatement.preparedStatement().getVariables.contains(parameterName)
