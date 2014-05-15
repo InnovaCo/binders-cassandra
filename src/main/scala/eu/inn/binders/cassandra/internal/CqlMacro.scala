@@ -11,7 +11,7 @@ import eu.inn.binders.naming.Converter
 
 object CqlMacro {
   def cql[C <: Converter : c.WeakTypeTag]
-    (c: Context)
+  (c: Context)
     (args: c.Expr[Any]*)
     (sessionQueryCache: c.Expr[eu.inn.binders.cassandra.SessionQueryCache[C]]): c.Expr[Statement[C]] = {
     import c.universe._
@@ -52,7 +52,7 @@ object CqlMacro {
   }
 
   def one[S: c.WeakTypeTag, O: c.WeakTypeTag]
-    (c: Context)
+  (c: Context)
     (executor: c.Expr[ExecutionContext]): c.Expr[Future[O]] = {
     import c.universe._
 
@@ -73,7 +73,7 @@ object CqlMacro {
   }
 
   def oneOption[S: c.WeakTypeTag, O: c.WeakTypeTag]
-    (c: Context)
+  (c: Context)
     (executor: c.Expr[ExecutionContext]): c.Expr[Future[Option[O]]] = {
     import c.universe._
 
@@ -89,7 +89,7 @@ object CqlMacro {
   }
 
   def all[S: c.WeakTypeTag, O: c.WeakTypeTag]
-    (c: Context)
+  (c: Context)
     (executor: c.Expr[ExecutionContext]): c.Expr[Future[Iterator[O]]] = {
     import c.universe._
 
