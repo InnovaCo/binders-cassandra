@@ -37,7 +37,7 @@ pomIncludeRepository := {
   _ => false
 }
 
-pomExtra := (
+pomExtra := {
   <url>https://github.com/InnovaCo/binders-cassandra</url>
     <licenses>
       <license>
@@ -62,4 +62,4 @@ pomExtra := (
         <url>https://github.com/maqdev</url>
       </developer>
     </developers>
-  )
+}

@@ -1,17 +1,19 @@
 package eu.inn.binders.cassandra.internal
 
+import scala.concurrent.{Future, ExecutionContext}
+import scala.language.experimental.macros
 import scala.language.reflectiveCalls
 import scala.reflect.macros.Context
-import language.experimental.macros
-import eu.inn.binders.naming.Converter
-import scala.concurrent.{Future, ExecutionContext}
+
 import eu.inn.binders.cassandra.Statement
+import eu.inn.binders.naming.Converter
+
 
 object CqlMacro {
   def cql[C <: Converter : c.WeakTypeTag]
   (c: Context)
-  (args: c.Expr[Any]*)
-  (sessionQueryCache: c.Expr[eu.inn.binders.cassandra.SessionQueryCache[C]]): c.Expr[Statement[C]] = {
+    (args: c.Expr[Any]*)
+    (sessionQueryCache: c.Expr[eu.inn.binders.cassandra.SessionQueryCache[C]]): c.Expr[Statement[C]] = {
     import c.universe._
 
     // Extract and format CQL query string from StringContext (which is this)
@@ -51,7 +53,7 @@ object CqlMacro {
 
   def one[S: c.WeakTypeTag, O: c.WeakTypeTag]
   (c: Context)
-  (executor: c.Expr[ExecutionContext]): c.Expr[Future[O]] = {
+    (executor: c.Expr[ExecutionContext]): c.Expr[Future[O]] = {
     import c.universe._
 
     val apply = Apply(
@@ -72,7 +74,7 @@ object CqlMacro {
 
   def oneOption[S: c.WeakTypeTag, O: c.WeakTypeTag]
   (c: Context)
-  (executor: c.Expr[ExecutionContext]): c.Expr[Future[Option[O]]] = {
+    (executor: c.Expr[ExecutionContext]): c.Expr[Future[Option[O]]] = {
     import c.universe._
 
     // rows.unbindOne[O]
@@ -88,7 +90,7 @@ object CqlMacro {
 
   def all[S: c.WeakTypeTag, O: c.WeakTypeTag]
   (c: Context)
-  (executor: c.Expr[ExecutionContext]): c.Expr[Future[Iterator[O]]] = {
+    (executor: c.Expr[ExecutionContext]): c.Expr[Future[Iterator[O]]] = {
     import c.universe._
 
     // rows.unbindAll[O]

@@ -1,8 +1,6 @@
 import eu.inn.binders.cassandra.{NoRowsSelectedException, CqlContext}
-import eu.inn.binders.naming.PlainConverter
 import org.scalatest.{FlatSpec, Matchers}
 import scala.concurrent.{Future, ExecutionContext}
-import scala.concurrent.duration._
 
 
 class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
