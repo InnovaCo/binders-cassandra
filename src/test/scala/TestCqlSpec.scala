@@ -76,6 +76,11 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     await(testImplicitFutureConvertToUnit(12))
   }
 
+  case class U(userid: Int)
+  "cql...execute " should " be able to execute with bind case class " in {
+    await(cql"delete from users where userid=?".bind(U(12)).execute)
+  }
+
   "cql...execute " should " be able to execute with parameters " in {
     await(cql"delete from users where userid=?".bindParameter(0, 12).execute)
   }
@@ -141,8 +146,8 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
 
   "cql...execute " should " be able to execute methods returning cql with parameters in batch" in {
     val bs = new BatchStatement()
-      .add(deleteStmt(12))
-      .add(deleteStmt(13))
+      .add(deleteStmt(12).boundStatement)
+      .add(deleteStmt(13).boundStatement)
     session.execute(bs)
   }
 

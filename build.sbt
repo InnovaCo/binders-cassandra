@@ -1,18 +1,18 @@
 name := "binders-cassandra"
 
-version := "0.2.1"
+version := "0.2.2"
 
 organization := "eu.inn"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.11.0"
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
 
-libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.1.2" % "test"
+libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.0" % "test"
 
 libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % "test"
 
-libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.1"
+libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.3"
 
 libraryDependencies += "eu.inn" %% "binders-core" % "0.2.0"
 
