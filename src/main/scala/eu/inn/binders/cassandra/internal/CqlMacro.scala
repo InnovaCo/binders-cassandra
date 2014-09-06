@@ -23,7 +23,7 @@ object CqlMacro {
       case _ => c.abort(c.enclosingPosition, "Invalid CQL!")
     }
 
-    val queryTerm = newTermName(c.fresh("$qry"))
+    val queryTerm = TermName(c.freshName("$qry"))
     val queryVal = ValDef(Modifiers(), queryTerm, TypeTree(),
       reify(
         sessionQueryCache.splice.createQuery(
@@ -32,13 +32,13 @@ object CqlMacro {
       ).tree
     )
 
-    val stmtTerm = newTermName(c.fresh("$stmt"))
+    val stmtTerm = TermName(c.freshName("$stmt"))
     val stmtVal = ValDef(Modifiers(), stmtTerm, TypeTree(),
-      Select(Ident(queryTerm), newTermName("createStatement"))
+      Select(Ident(queryTerm), TermName("createStatement"))
     )
 
-    val bindArgsCall: List[c.Tree] = if (!args.isEmpty) {
-      List(Apply(Select(Ident(stmtTerm), newTermName("bindArgs")), args.map(_.tree).toList))
+    val bindArgsCall: List[c.Tree] = if (args.nonEmpty) {
+      List(Apply(Select(Ident(stmtTerm), TermName("bindArgs")), args.map(_.tree).toList))
     } else {
       Nil
     }
@@ -80,7 +80,7 @@ object CqlMacro {
     // rows.unbindOne[O]
     val apply =
       TypeApply(
-        Select(Ident(newTermName("rows")), newTermName("unbindOne")),
+        Select(Ident(TermName("rows")), TermName("unbindOne")),
         List(Ident(weakTypeOf[O].typeSymbol))
       )
 
@@ -96,7 +96,7 @@ object CqlMacro {
     // rows.unbindAll[O]
     val apply =
       TypeApply(
-        Select(Ident(newTermName("rows")), newTermName("unbindAll")),
+        Select(Ident(TermName("rows")), TermName("unbindAll")),
         List(Ident(weakTypeOf[O].typeSymbol))
       )
 
@@ -107,16 +107,16 @@ object CqlMacro {
   private def executeAndMap[S: c.WeakTypeTag, O: c.WeakTypeTag](c: Context)(map: c.universe.Tree): c.universe.Tree = {
     import c.universe._
 
-    val stmtTerm = newTermName(c.fresh("$stmt"))
-    val stmtVal = ValDef(Modifiers(), stmtTerm, TypeTree(), Select(c.prefix.tree, newTermName("stmt")))
+    val stmtTerm = TermName(c.freshName("$stmt"))
+    val stmtVal = ValDef(Modifiers(), stmtTerm, TypeTree(), Select(c.prefix.tree, TermName("stmt")))
 
     val mapCall = Apply(
       //stmt.execute.map(
-      Select(Select(Ident(stmtTerm), newTermName("execute")), newTermName("map")),
+      Select(Select(Ident(stmtTerm), TermName("execute")), newTermName("map")),
       List(
         Function(
           // rows =>
-          List(ValDef(Modifiers(Flag.PARAM), newTermName("rows"), TypeTree(), EmptyTree)),
+          List(ValDef(Modifiers(Flag.PARAM), TermName("rows"), TypeTree(), EmptyTree)),
           map
         )
       )
@@ -132,11 +132,11 @@ object CqlMacro {
     import c.universe._
     List(Throw(Apply(Select(New(
       Select(
-        Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
-        newTypeName("NoRowsSelectedException")
+        Select(Select(Select(Ident(TermName("eu")), TermName("inn")), TermName("binders")), TermName("cassandra")),
+        TypeName("NoRowsSelectedException")
       )
     ),
-      nme.CONSTRUCTOR),
+      termNames.CONSTRUCTOR),
       List(Literal(Constant(weakTypeOf[O].typeSymbol.fullName)))
     )))
   }
