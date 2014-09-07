@@ -26,7 +26,7 @@ object CqlMacro {
     // query code (static/dynamic)
     val queryCode = getQueryCode[C](c)(strings, args)
 
-    val queryTerm = TermName(c.freshName("$qry"))
+    val queryTerm = newTermName(c.fresh("$qry"))
     val queryVal = ValDef(Modifiers(), queryTerm, TypeTree(),
       reify(
         sessionQueryCache.splice.createQuery(
@@ -35,14 +35,14 @@ object CqlMacro {
       ).tree
     )
 
-    val stmtTerm = TermName(c.freshName("$stmt"))
+    val stmtTerm = newTermName(c.fresh("$stmt"))
     val stmtVal = ValDef(Modifiers(), stmtTerm, TypeTree(),
-      Select(Ident(queryTerm), TermName("createStatement"))
+      Select(Ident(queryTerm), newTermName("createStatement"))
     )
 
     val staticArgs = args.filterNot(_.actualType <:< typeOf[DynamicQuery])
     val bindArgsCall: List[c.Tree] = if (staticArgs.nonEmpty) {
-      List(Apply(Select(Ident(stmtTerm), TermName("bindArgs")), staticArgs.map(_.tree).toList))
+      List(Apply(Select(Ident(stmtTerm), newTermName("bindArgs")), staticArgs.map(_.tree).toList))
     } else {
       Nil
     }
@@ -85,7 +85,7 @@ object CqlMacro {
     // rows.unbindOne[O]
     val apply =
       TypeApply(
-        Select(Ident(TermName("rows")), TermName("unbindOne")),
+        Select(Ident(newTermName("rows")), newTermName("unbindOne")),
         List(Ident(weakTypeOf[O].typeSymbol))
       )
 
@@ -101,7 +101,7 @@ object CqlMacro {
     // rows.unbindAll[O]
     val apply =
       TypeApply(
-        Select(Ident(TermName("rows")), TermName("unbindAll")),
+        Select(Ident(newTermName("rows")), newTermName("unbindAll")),
         List(Ident(weakTypeOf[O].typeSymbol))
       )
 
@@ -112,16 +112,16 @@ object CqlMacro {
   private def executeAndMap[S: c.WeakTypeTag, O: c.WeakTypeTag](c: Context)(map: c.universe.Tree): c.universe.Tree = {
     import c.universe._
 
-    val stmtTerm = TermName(c.freshName("$stmt"))
-    val stmtVal = ValDef(Modifiers(), stmtTerm, TypeTree(), Select(c.prefix.tree, TermName("stmt")))
+    val stmtTerm = newTermName(c.fresh("$stmt"))
+    val stmtVal = ValDef(Modifiers(), stmtTerm, TypeTree(), Select(c.prefix.tree, newTermName("stmt")))
 
     val mapCall = Apply(
       //stmt.execute.map(
-      Select(Select(Ident(stmtTerm), TermName("execute")), newTermName("map")),
+      Select(Select(Ident(stmtTerm), newTermName("execute")), newTermName("map")),
       List(
         Function(
           // rows =>
-          List(ValDef(Modifiers(Flag.PARAM), TermName("rows"), TypeTree(), EmptyTree)),
+          List(ValDef(Modifiers(Flag.PARAM), newTermName("rows"), TypeTree(), EmptyTree)),
           map
         )
       )
@@ -150,15 +150,15 @@ object CqlMacro {
   (strings: List[String], args: Seq[c.type#Expr[Any]]) : (c.Tree, List[c.Tree]) = {
     import c.universe._
 
-    val sbTerm = TermName(c.freshName("$sb"))
+    val sbTerm = newTermName(c.fresh("$sb"))
     val sbVal = ValDef(Modifiers(), sbTerm, TypeTree(),
       Apply(Select(New(
         Select(
-          Select(Select(Ident(TermName("scala")), TermName("collection")), TermName("mutable")),
-          TypeName("StringBuilder")
+          Select(Select(Ident(newTermName("scala")), newTermName("collection")), newTermName("mutable")),
+          newTypeName("StringBuilder")
         )
       ),
-        termNames.CONSTRUCTOR),
+        nme.CONSTRUCTOR),
         List()
       )
     )
@@ -170,25 +170,25 @@ object CqlMacro {
           val stringContextArg = argsIterator.next()
           if (stringContextArg.actualType <:< typeOf[DynamicQuery]) {
             List(
-              Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant(s)))),
-              Apply(Select(Ident(sbTerm), TermName("append")), List(
-                Select(stringContextArg.tree, TermName("getDynamicQuery"))
+              Apply(Select(Ident(sbTerm), newTermName("append")), List(Literal(Constant(s)))),
+              Apply(Select(Ident(sbTerm), newTermName("append")), List(
+                Select(stringContextArg.tree, newTermName("getDynamicQuery"))
               ))
             )
           }
           else {
             List(
-              Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant(s)))),
-              Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant("?"))))
+              Apply(Select(Ident(sbTerm), newTermName("append")), List(Literal(Constant(s)))),
+              Apply(Select(Ident(sbTerm), newTermName("append")), List(Literal(Constant("?"))))
             )
           }
         }
         else {
-          List(Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant(s)))))
+          List(Apply(Select(Ident(sbTerm), newTermName("append")), List(Literal(Constant(s)))))
         }
       }.flatten
 
-    (Apply(Select(Ident(sbTerm), TermName("toString")), List()), List(sbVal) ++ appendCalls)
+    (Apply(Select(Ident(sbTerm), newTermName("toString")), List()), List(sbVal) ++ appendCalls)
   }
 
   private def getStaticQueryCode[C <: Converter : c.WeakTypeTag]
@@ -204,11 +204,11 @@ object CqlMacro {
     import c.universe._
     List(Throw(Apply(Select(New(
       Select(
-        Select(Select(Select(Ident(TermName("eu")), TermName("inn")), TermName("binders")), TermName("cassandra")),
-        TypeName("NoRowsSelectedException")
+        Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
+        newTypeName("NoRowsSelectedException")
       )
     ),
-      termNames.CONSTRUCTOR),
+      nme.CONSTRUCTOR),
       List(Literal(Constant(weakTypeOf[O].typeSymbol.fullName)))
     )))
   }
