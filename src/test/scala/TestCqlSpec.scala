@@ -111,6 +111,20 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     assert(user.get.created == yesterday)
   }
 
+  "cql...execute " should " be able to execute dynamic cql with parameters " in {
+    val d1 = Dynamic("select")
+    val d2 = Dynamic("userId,")
+    val d3 = Dynamic("name,created")
+    val user = await(
+      cql"$d1 $d2 $d3 from users ${Dynamic("where userid=?")}".bindArgs(11).execute
+    ).unbindOne[User]
+
+    assert(user.isDefined)
+    assert(user.get.userId == 11)
+    assert(user.get.name == "alla")
+    assert(user.get.created == yesterday)
+  }
+
   "cql...execute " should " be able to select two rows with 2 plain parameters " in {
     val users = await(
       cql"select userId,name,created from users where userid in(?,?)".bindArgs(10, 11).execute

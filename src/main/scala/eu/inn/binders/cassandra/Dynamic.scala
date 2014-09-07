@@ -1,5 +1,5 @@
 package eu.inn.binders.cassandra
 
-class DynamicQueryString(query: String) extends DynamicQuery {
+case class Dynamic(query: String) extends DynamicQuery {
   override def getDynamicQuery: String = query
 }

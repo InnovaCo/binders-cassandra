@@ -5,7 +5,7 @@ import scala.language.experimental.macros
 import scala.language.reflectiveCalls
 import scala.reflect.macros.Context
 
-import eu.inn.binders.cassandra.Statement
+import eu.inn.binders.cassandra.{DynamicQuery, Statement}
 import eu.inn.binders.naming.Converter
 
 
@@ -17,17 +17,20 @@ object CqlMacro {
     import c.universe._
 
     // Extract and format CQL query string from StringContext (which is this)
-    val queryString = c.prefix.tree match {
+    val strings: List[String] = c.prefix.tree match {
       case Apply(_, List(Apply(_, stringParts))) =>
-        stringParts.map(_.asInstanceOf[Literal].value.value).mkString("?")
+        stringParts.map(_.asInstanceOf[Literal].value.value.toString)
       case _ => c.abort(c.enclosingPosition, "Invalid CQL!")
     }
+
+    // query code (static/dynamic)
+    val queryCode = getQueryCode[C](c)(strings, args)
 
     val queryTerm = TermName(c.freshName("$qry"))
     val queryVal = ValDef(Modifiers(), queryTerm, TypeTree(),
       reify(
         sessionQueryCache.splice.createQuery(
-          c.Expr[String](Literal(Constant(queryString))).splice
+          c.Expr[String](queryCode._1).splice
         )
       ).tree
     )
@@ -37,17 +40,19 @@ object CqlMacro {
       Select(Ident(queryTerm), TermName("createStatement"))
     )
 
-    val bindArgsCall: List[c.Tree] = if (args.nonEmpty) {
-      List(Apply(Select(Ident(stmtTerm), TermName("bindArgs")), args.map(_.tree).toList))
+    val staticArgs = args.filterNot(_.actualType <:< typeOf[DynamicQuery])
+    val bindArgsCall: List[c.Tree] = if (staticArgs.nonEmpty) {
+      List(Apply(Select(Ident(stmtTerm), TermName("bindArgs")), staticArgs.map(_.tree).toList))
     } else {
       Nil
     }
 
     val block = Block(
-      List(queryVal, stmtVal) ++ bindArgsCall,
+      queryCode._2 ++ List(queryVal, stmtVal) ++ bindArgsCall,
       Ident(stmtTerm)
     )
 
+    //println(block)
     c.Expr[Statement[C]](block)
   }
 
@@ -126,6 +131,73 @@ object CqlMacro {
     val block = Block(vals, mapCall)
     // println(block)
     block
+  }
+
+  private def getQueryCode[C <: Converter : c.WeakTypeTag]
+  (c: Context)
+  (strings: List[String], args: Seq[c.type#Expr[Any]]) : (c.Tree, List[c.Tree]) = {
+    import c.universe._
+
+    if (args.exists(_.actualType <:< typeOf[DynamicQuery])) {
+      getDynamicQueryCode[C](c)(strings,args)
+    }else {
+      getStaticQueryCode[C](c)(strings,args)
+    }
+  }
+
+  private def getDynamicQueryCode[C <: Converter : c.WeakTypeTag]
+  (c: Context)
+  (strings: List[String], args: Seq[c.type#Expr[Any]]) : (c.Tree, List[c.Tree]) = {
+    import c.universe._
+
+    val sbTerm = TermName(c.freshName("$sb"))
+    val sbVal = ValDef(Modifiers(), sbTerm, TypeTree(),
+      Apply(Select(New(
+        Select(
+          Select(Select(Ident(TermName("scala")), TermName("collection")), TermName("mutable")),
+          TypeName("StringBuilder")
+        )
+      ),
+        termNames.CONSTRUCTOR),
+        List()
+      )
+    )
+
+    val argsIterator = args.iterator
+    val appendCalls =
+      strings.map { s =>
+        if (argsIterator.hasNext) {
+          val stringContextArg = argsIterator.next()
+          if (stringContextArg.actualType <:< typeOf[DynamicQuery]) {
+            List(
+              Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant(s)))),
+              Apply(Select(Ident(sbTerm), TermName("append")), List(
+                Select(stringContextArg.tree, TermName("getDynamicQuery"))
+              ))
+            )
+          }
+          else {
+            List(
+              Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant(s)))),
+              Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant("?"))))
+            )
+          }
+        }
+        else {
+          List(Apply(Select(Ident(sbTerm), TermName("append")), List(Literal(Constant(s)))))
+        }
+      }.flatten
+
+    (Apply(Select(Ident(sbTerm), TermName("toString")), List()), List(sbVal) ++ appendCalls)
+  }
+
+  private def getStaticQueryCode[C <: Converter : c.WeakTypeTag]
+  (c: Context)
+  (strings: List[String], args: Seq[c.type#Expr[Any]]) : (c.Tree, List[c.Tree]) = {
+    import c.universe._
+
+    val queryString = strings.mkString("?")
+    (Literal(Constant(queryString)), List())
   }
 
   private def throwNoRows[O: c.WeakTypeTag](c: Context): List[c.Tree] = {

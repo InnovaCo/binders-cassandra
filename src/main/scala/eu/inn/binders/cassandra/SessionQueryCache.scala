@@ -14,11 +14,13 @@ class SessionQueryCache[C <: Converter : TypeTag](val session: Session) {
   def createQuery(query: String): Query[C] =
     cache.get(query, new Loader(query))
 
+  protected def newQuery(query: String) = new Query[C](session, query)
+
   private val cache: Cache[String, Query[C]] =
     CacheBuilder.newBuilder().weakKeys().build()
 
   private class Loader(query: String) extends Callable[Query[C]] {
-    override def call(): Query[C] = new Query[C](session, query)
+    override def call(): Query[C] = newQuery(query)
   }
 
 }
