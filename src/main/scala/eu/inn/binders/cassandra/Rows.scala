@@ -7,7 +7,7 @@ import com.datastax.driver.core.ResultSet
 import eu.inn.binders.naming.Converter
 
 
-class Rows[C <: Converter : TypeTag](resultSet: ResultSet) extends eu.inn.binders.core.Rows[Row[C]] {
+class Rows[C <: Converter : TypeTag](val resultSet: ResultSet) extends eu.inn.binders.core.Rows[Row[C]] {
   type nameConverterType = C
 
   import scala.collection.JavaConversions._

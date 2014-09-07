@@ -9,7 +9,7 @@ import scala.reflect.runtime.universe._
 import eu.inn.binders.naming.Converter
 
 
-class Row[C <: Converter : TypeTag](row: com.datastax.driver.core.Row) extends eu.inn.binders.core.Row {
+class Row[C <: Converter : TypeTag](val row: com.datastax.driver.core.Row) extends eu.inn.binders.core.Row {
   type nameConverterType = C
 
   import scala.reflect._
