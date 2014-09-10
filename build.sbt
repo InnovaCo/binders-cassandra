@@ -10,8 +10,6 @@ crossScalaVersions := Seq("2.11.2", "2.10.4")
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
 
-libraryDependencies <+= scalaVersion(scalatestDependency(_))
-
 libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % "test"
 
 libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.0"
@@ -22,10 +20,7 @@ libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
 
 libraryDependencies += "com.google.guava" % "guava" % "16.0.1"
 
-def scalatestDependency(scalaVersion: String) = scalaVersion match {
-  case s if s.startsWith("2.10.") => "org.scalatest" % "scalatest_2.10" % "2.2.0" % "test"
-  case s if s.startsWith("2.11.") => "org.scalatest" % "scalatest_2.11" % "2.2.0" % "test"
-}
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.0" % "test"
 
 // Sonatype repositary publish options
 publishMavenStyle := true
