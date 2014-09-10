@@ -17,7 +17,7 @@ Here is the sample of Scala class that is initialized with Cassandra session and
       // class for binding input/output parameters
       case class User(userId: Int, name: String)
 
-      def insertUser(user: User): Future[Unit] = cql"insert into users(userid, name) values (?, ?)".bind(user).execute
+      def insertUser(user: User): Future[Unit] = cql"insert into users(userid, name) values (?, ?)".bind(user).execute()
 
       // returns Future[Iterator[User]]
       def selectAllUsers: Future[Iterator[User]] = cql"select * from users".all[User]
@@ -54,14 +54,12 @@ To use library, add this line to the build.sbt file:
 
 Currently tested and works with:
 
-* binders-core 0.2.0
+* binders-core 0.2.2
 * Cassandra 2.0.1 (corresponding driver with prepared statements)
-* Scala 2.10.3
+* Scala 2.11.2, 2.10.4
 * sbt 0.13
 * guava from google 16.0.1
 
 ## License
 
 Product licensed under BSD 3-clause as stated in file LICENSE
-
-

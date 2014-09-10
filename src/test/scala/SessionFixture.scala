@@ -24,7 +24,7 @@ trait SessionFixture extends BeforeAndAfter {
     cal.getTime
   }
 
-  def createUser(id: Int, name: String, created: Date) = await(cql"insert into users(userId, name, created) values ($id,$name,$created)".execute)
+  def createUser(id: Int, name: String, created: Date) = await(cql"insert into users(userId, name, created) values ($id,$name,$created)".execute())
 
   before {
     cluster = Cluster.builder().addContactPoint("127.0.0.1").build()

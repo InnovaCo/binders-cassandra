@@ -63,14 +63,14 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
 
   "cql...execute " should " be able to execute command with StringContext parameters" in {
     val userId = 12
-    await(cql"delete from users where userid=$userId".execute)
+    await(cql"delete from users where userid=$userId".execute())
   }
 
   "cql...execute " should " be able to execute command " in {
-    await(cql"delete from users where userid=12".execute)
+    await(cql"delete from users where userid=12".execute())
   }
 
-  def testImplicitFutureConvertToUnit(userId: Int): Future[Unit] = cql"delete from users where userid=$userId".execute
+  def testImplicitFutureConvertToUnit(userId: Int): Future[Unit] = cql"delete from users where userid=$userId".execute()
 
   "cql...execute " should " be able to execute command and convert Future[Rows[_]] to Future[Unit[_]]" in {
     await(testImplicitFutureConvertToUnit(12))
@@ -78,20 +78,20 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
 
   case class U(userid: Int)
   "cql...execute " should " be able to execute with bind case class " in {
-    await(cql"delete from users where userid=?".bind(U(12)).execute)
+    await(cql"delete from users where userid=?".bind(U(12)).execute())
   }
 
   "cql...execute " should " be able to execute with parameters " in {
-    await(cql"delete from users where userid=?".bindParameter(0, 12).execute)
+    await(cql"delete from users where userid=?".bindParameter(0, 12).execute())
   }
 
   "cql...execute " should " be able to execute with 2 primitive parameters " in {
-    await(cql"delete from users where userid in(?,?)".bindArgs(12, 13).execute)
+    await(cql"delete from users where userid in(?,?)".bindArgs(12, 13).execute())
   }
 
   "cql...execute " should " be able to select one row " in {
     val user = await(
-      cql"select userId,name,created from users where userid=10".execute
+      cql"select userId,name,created from users where userid=10".execute()
     ).unbindOne[User]
 
     assert(user.isDefined)
@@ -102,7 +102,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
 
   "cql...execute " should " be able to select one row with parameters " in {
     val user = await(
-      cql"select userId,name,created from users where userid=?".bindArgs(11).execute
+      cql"select userId,name,created from users where userid=?".bindArgs(11).execute()
     ).unbindOne[User]
 
     assert(user.isDefined)
@@ -116,7 +116,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     val d2 = Dynamic("userId,")
     val d3 = Dynamic("name,created")
     val user = await(
-      cql"$d1 $d2 $d3 from users ${Dynamic("where userid=?")}".bindArgs(11).execute
+      cql"$d1 $d2 $d3 from users ${Dynamic("where userid=?")}".bindArgs(11).execute()
     ).unbindOne[User]
 
     assert(user.isDefined)
@@ -127,7 +127,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
 
   "cql...execute " should " be able to select two rows with 2 plain parameters " in {
     val users = await(
-      cql"select userId,name,created from users where userid in(?,?)".bindArgs(10, 11).execute
+      cql"select userId,name,created from users where userid in(?,?)".bindArgs(10, 11).execute()
     ).unbindAll[User]
 
     assert(users.length == 2)
@@ -135,14 +135,14 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
 
   "cql...execute " should " be able to select rows " in {
     val users = await(
-      cql"select userId,name,created from users where userid in (10,11)".execute
+      cql"select userId,name,created from users where userid in (10,11)".execute()
     ).unbindAll[User]
     assert(users.length == 2)
   }
 
   "cql...execute " should " be able to select 0 rows " in {
     val users = await(
-      cql"select userId,name,created from users where userid in (12,13)".execute
+      cql"select userId,name,created from users where userid in (12,13)".execute()
     ).unbindAll[User]
     assert(users.length == 0)
   }

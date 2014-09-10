@@ -12,5 +12,5 @@ class Query[C <: Converter : TypeTag](val session: Session, val preparedStatemen
 
   def this(session: Session, queryString: String) = this(session, session.prepare(queryString))
 
-  override def createStatement: Statement[C] = new Statement[C](session, new BoundStatement(preparedStatement))
+  override def createStatement(): Statement[C] = new Statement[C](session, new BoundStatement(preparedStatement))
 }

@@ -12,7 +12,7 @@ class Db(session: com.datastax.driver.core.Session) {
   // class for binding input/output parameters
   case class User(userId: Int, name: String)
 
-  def insertUser(user: User): Future[Unit] = cql"insert into users(userid, name) values (?, ?)".bind(user).execute
+  def insertUser(user: User): Future[Unit] = cql"insert into users(userid, name) values (?, ?)".bind(user).execute()
 
   // returns Future[Iterator[User]]
   def selectAllUsers: Future[Iterator[User]] = cql"select * from users".all[User]
