@@ -5,7 +5,7 @@ import scala.language.experimental.macros
 import scala.language.reflectiveCalls
 import scala.reflect.macros.Context
 
-import eu.inn.binders.cassandra.{DynamicQuery, Statement}
+import eu.inn.binders.cassandra.{IfApplied, DynamicQuery, Statement}
 import eu.inn.binders.naming.Converter
 
 
@@ -75,6 +75,41 @@ object CqlMacro {
 
     val tree = executeAndMap[S, O](c)(apply)
     c.Expr[Future[O]](tree)
+  }
+
+  def oneApplied[S: c.WeakTypeTag, O: c.WeakTypeTag]
+  (c: Context)
+  (executor: c.Expr[ExecutionContext]): c.Expr[Future[IfApplied[O]]] = {
+    import c.universe._
+
+    val condition = Select(Ident(newTermName("rows")), newTermName("wasApplied"))
+
+    val apply = If(condition,
+      Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
+        newTermName("Applied")),
+
+      Apply(Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
+        newTermName("NotApplied")),
+        List(
+          // rows.unbindOne[O].getOrElse(throw)
+          Apply(
+            Select(
+              // rows.unbindOne[O]
+              TypeApply(
+                Select(Ident(newTermName("rows")), newTermName("unbindOne")),
+                List(Ident(weakTypeOf[O].typeSymbol))
+              ),
+              newTermName("getOrElse")
+            ),
+            throwNoRows[O](c)
+          )
+        )
+      )
+    )
+
+    val tree = executeAndMap[S, O](c)(apply)
+    // println(tree)
+    c.Expr[Future[IfApplied[O]]](tree)
   }
 
   def oneOption[S: c.WeakTypeTag, O: c.WeakTypeTag]

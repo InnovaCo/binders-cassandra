@@ -54,7 +54,7 @@ To use library, add this line to the build.sbt file:
 
 Currently tested and works with:
 
-* binders-core 0.2.2
+* binders-core 0.2.3
 * Cassandra 2.0.1 (corresponding driver with prepared statements)
 * Scala 2.11.2, 2.10.4
 * sbt 0.13

@@ -17,6 +17,8 @@ package object cassandra {
   implicit class StatementOps[S <: Statement[_]](val stmt: S) {
     def one[O](implicit executor: ExecutionContext): Future[O] = macro CqlMacro.one[S, O]
 
+    def oneApplied[O](implicit executor: ExecutionContext): Future[IfApplied[O]] = macro CqlMacro.oneApplied[S, O]
+
     def oneOption[O](implicit executor: ExecutionContext): Future[Option[O]] = macro CqlMacro.oneOption[S, O]
 
     def all[O](implicit executor: ExecutionContext): Future[Iterator[O]] = macro CqlMacro.all[S, O]

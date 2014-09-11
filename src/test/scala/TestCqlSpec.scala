@@ -1,7 +1,8 @@
 import com.datastax.driver.core.BatchStatement
 import eu.inn.binders.cassandra._
 import org.scalatest.{FlatSpec, Matchers}
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{Await, Future, ExecutionContext}
+import scala.concurrent.duration._
 
 
 class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
@@ -9,6 +10,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
   import ExecutionContext.Implicits.global
 
   case class User(userId: Int, name: String, created: java.util.Date)
+  case class UserName(name: String)
 
   "cql...one " should " select one row with parameters " in {
     val userId = 11
@@ -26,7 +28,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     val user = await(selectUser(11))
   }
 
-  "cql...oneOption " should " return Some() if if row is found" in {
+  "cql...oneOption " should " return Some() if row is found" in {
     val userId = 11
     val user =
       await(cql"select userId,name,created from users where userid=$userId".oneOption[User])
@@ -163,6 +165,19 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
       .add(deleteStmt(12).boundStatement)
       .add(deleteStmt(13).boundStatement)
     session.execute(bs)
+  }
+
+  "cql...oneApplied " should " return NotApplied if condition is false and columns with original data" in {
+    val userId = 10
+    val a = await(cql"update users set name = 'magomed' where userid=$userId if name='not-maga'".oneApplied[UserName])
+    assert(!a.isApplied)
+    assert(a.get.name == "maga")
+  }
+
+  "cql...oneApplied " should " return Applied if condition is true" in {
+    val userId = 10
+    val a = await(cql"update users set name = 'magomed' where userid=$userId if name='maga'".oneApplied[UserName])
+    assert(a.isApplied)
   }
 
   /*

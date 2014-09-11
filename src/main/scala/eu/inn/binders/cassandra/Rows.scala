@@ -12,5 +12,30 @@ class Rows[C <: Converter : TypeTag](val resultSet: ResultSet) extends eu.inn.bi
 
   import scala.collection.JavaConversions._
 
-  def iterator: Iterator[Row[C]] = resultSet.iterator().map(r => new Row[C](r))
+  def iterator(): Iterator[Row[C]] = {
+    if (_it != null) {
+      val i = _it
+      _it = null
+      i
+    }
+    else
+      resultSet.iterator().map(r => new Row[C](r))
+  }
+
+  // todo: update to resultSet.wasApplied() and remove _it
+  // this is temporary implementation, until this commit is released
+  // https://github.com/datastax/java-driver/commit/cd843bea8dee74506cd0a2c4753bcd678998b73a
+  private var _it: Iterator[Row[C]] = null
+
+  def wasApplied: Boolean = {
+    val i = iterator()
+    if (i.hasNext) {
+      val firstRow = i.next()
+      _it = Iterator(firstRow) ++ i
+      firstRow.getBoolean("[applied]")
+    }
+    else {
+      true
+    }
+  }
 }
