@@ -48,13 +48,13 @@ For the unit tests and sample application working local instance of Cassandra is
 
 To use library, add this line to the build.sbt file:
 
-    libraryDependencies += "eu.inn" %% "binders-cassandra" % "0.2.0"
+    libraryDependencies += "eu.inn" %% "binders-cassandra" % "0.2.5"
 
 ## Requirements
 
 Currently tested and works with:
 
-* binders-core 0.2.3
+* binders-core 0.2.4
 * Cassandra 2.0.1 (corresponding driver with prepared statements)
 * Scala 2.11.2, 2.10.4
 * sbt 0.13
