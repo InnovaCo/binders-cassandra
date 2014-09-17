@@ -167,11 +167,20 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     session.execute(bs)
   }
 
-  "cql...oneApplied " should " return NotApplied if condition is false and columns with original data" in {
+  "cql...oneApplied " should " return NotAppliedExists if condition is false and columns with original data" in {
     val userId = 10
     val a = await(cql"update users set name = 'magomed' where userid=$userId if name='not-maga'".oneApplied[UserName])
     assert(!a.isApplied)
-    assert(a.get.name == "maga")
+    assert(a.isExists)
+    assert(a.result.get.name == "maga")
+  }
+
+  "cql...oneApplied " should " return NotApplied if condition is false and original row doesn't exists" in {
+    val userId = -1
+    val a = await(cql"update users set name = 'magomed' where userid=$userId if name='not-maga'".oneApplied[UserName])
+    assert(!a.isApplied)
+    assert(!a.isExists)
+    assert(a.result == None)
   }
 
   "cql...oneApplied " should " return Applied if condition is true" in {

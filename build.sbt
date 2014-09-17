@@ -1,6 +1,6 @@
 name := "binders-cassandra"
 
-version := "0.2.5"
+version := "0.2.6"
 
 organization := "eu.inn"
 

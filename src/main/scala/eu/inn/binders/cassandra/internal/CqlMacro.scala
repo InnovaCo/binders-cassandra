@@ -82,33 +82,41 @@ object CqlMacro {
   (executor: c.Expr[ExecutionContext]): c.Expr[Future[IfApplied[O]]] = {
     import c.universe._
 
-    val condition = Select(Ident(newTermName("rows")), newTermName("wasApplied"))
+    val appliedCondition = Select(Ident(newTermName("rows")), newTermName("wasApplied"))
+    val appliedRowExistsCondition = Apply(Select(Apply(Select(
+      Apply(Select(Select(Ident(newTermName("rows")), newTermName("resultSet")),newTermName("getColumnDefinitions")), List()),
+      newTermName("size")), List()),
+      newTermName("$greater")), List(Literal(Constant(1))))
 
-    val apply = If(condition,
+    val apply = If(appliedCondition,
       Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
         newTermName("Applied")),
 
-      Apply(Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
-        newTermName("NotApplied")),
-        List(
-          // rows.unbindOne[O].getOrElse(throw)
-          Apply(
-            Select(
-              // rows.unbindOne[O]
-              TypeApply(
-                Select(Ident(newTermName("rows")), newTermName("unbindOne")),
-                List(Ident(weakTypeOf[O].typeSymbol))
+      If(appliedRowExistsCondition,
+        Apply(Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
+          newTermName("NotAppliedExists")),
+          List(
+            // rows.unbindOne[O].getOrElse(throw)
+            Apply(
+              Select(
+                // rows.unbindOne[O]
+                TypeApply(
+                  Select(Ident(newTermName("rows")), newTermName("unbindOne")),
+                  List(Ident(weakTypeOf[O].typeSymbol))
+                ),
+                newTermName("getOrElse")
               ),
-              newTermName("getOrElse")
-            ),
-            throwNoRows[O](c)
+              throwNoRows[O](c)
+            )
           )
-        )
+        ),
+        Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
+          newTermName("NotApplied"))
       )
     )
 
     val tree = executeAndMap[S, O](c)(apply)
-    // println(tree)
+    //println(tree)
     c.Expr[Future[IfApplied[O]]](tree)
   }
 
