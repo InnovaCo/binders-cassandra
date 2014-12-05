@@ -10,6 +10,7 @@ import scala.reflect.runtime.universe._
 
 import com.datastax.driver.core.{ResultSet, Session, BoundStatement}
 import com.google.common.util.concurrent.{FutureCallback, Futures}
+import org.slf4j.LoggerFactory
 
 import eu.inn.binders.naming.Converter
 
@@ -20,7 +21,13 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
 
   import scala.collection.JavaConversions._
 
+  private val logger = LoggerFactory.getLogger(getClass)
+
   override def execute(): Future[Rows[C]] = {
+    if (logger.isTraceEnabled) {
+      logger.trace(boundStatement.preparedStatement.getQueryString)
+    }
+
     val promise = Promise[Rows[C]]()
     Futures.addCallback(session.executeAsync(boundStatement), new FutureConverter(promise))
     promise.future
