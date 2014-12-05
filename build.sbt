@@ -20,6 +20,8 @@ libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
 
 libraryDependencies += "com.google.guava" % "guava" % "16.0.1"
 
+libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.7"
+
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.0" % "test"
 
 // Sonatype repositary publish options
