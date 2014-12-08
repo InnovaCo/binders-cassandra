@@ -9,13 +9,13 @@ import scala.reflect.runtime.universe._
 import eu.inn.binders.naming.Converter
 
 
-class Row[C <: Converter : TypeTag](val row: com.datastax.driver.core.Row) extends eu.inn.binders.core.Row {
-  type nameConverterType = C
-
+class Row[C <: Converter : TypeTag](val row: com.datastax.driver.core.Row) extends eu.inn.binders.core.Deserializer[C]  {
   import scala.reflect._
   import scala.collection.JavaConversions._
 
   def hasField(name: String): Boolean = row.getColumnDefinitions.contains(name)
+
+  def iterator() = ???
 
   def checkNotNull(name: String) = if (row.isNull(name)) throw new ColumnValueIsNullException(name)
 

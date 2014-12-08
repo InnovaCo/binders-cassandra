@@ -16,14 +16,12 @@ import eu.inn.binders.naming.Converter
 
 
 class Statement[C <: Converter : TypeTag](val session: Session, val boundStatement: BoundStatement)
-  extends eu.inn.binders.core.Statement[Future[Rows[C]]] {
-  type nameConverterType = C
-
+  extends eu.inn.binders.core.Serializer[C] {
   import scala.collection.JavaConversions._
 
   private val logger = LoggerFactory.getLogger(getClass)
 
-  override def execute(): Future[Rows[C]] = {
+  def execute(): Future[Rows[C]] = {
     if (logger.isTraceEnabled) {
       logger.trace(boundStatement.preparedStatement.getQueryString)
     }
@@ -43,7 +41,7 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
     }
   }
 
-  def hasParameter(parameterName: String): Boolean = boundStatement.preparedStatement().getVariables.contains(parameterName)
+  def hasField(fieldName: String): Boolean = boundStatement.preparedStatement().getVariables.contains(fieldName)
 
   def setString(index: Int, value: String) = boundStatement.setString(index, value)
 

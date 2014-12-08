@@ -7,10 +7,10 @@ import com.datastax.driver.core.ResultSet
 import eu.inn.binders.naming.Converter
 
 
-class Rows[C <: Converter : TypeTag](val resultSet: ResultSet) extends eu.inn.binders.core.Rows[Row[C]] {
-  type nameConverterType = C
-
+class Rows[C <: Converter : TypeTag](val resultSet: ResultSet) extends eu.inn.binders.core.Deserializer[C] {
   import scala.collection.JavaConversions._
+
+  def hasField(fieldName : scala.Predef.String) = ???
 
   def iterator(): Iterator[Row[C]] = {
     if (_it != null) {

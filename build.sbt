@@ -1,28 +1,28 @@
 name := "binders-cassandra"
 
-version := "0.2.6"
+version := "0.3.0"
 
 organization := "eu.inn"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
 
-crossScalaVersions := Seq("2.11.2", "2.10.4")
+crossScalaVersions := Seq("2.11.4", "2.10.4")
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
 
-libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % "test"
+libraryDependencies += "org.mockito" % "mockito-all" % "1.10.14" % "test"
 
-libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.0"
+libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.3"
 
-libraryDependencies += "eu.inn" %% "binders-core" % "0.2.3"
+libraryDependencies += "eu.inn" %% "binders-core" % "0.3.0"
 
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
 
-libraryDependencies += "com.google.guava" % "guava" % "16.0.1"
+libraryDependencies += "com.google.guava" % "guava" % "18.0"
 
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.7"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.0" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 
 // Sonatype repositary publish options
 publishMavenStyle := true

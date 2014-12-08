@@ -1,6 +1,5 @@
 import com.datastax.driver.core.BatchStatement
 import eu.inn.binders.cassandra.Query
-import eu.inn.binders.core.Rows
 import eu.inn.binders.naming.PlainConverter
 import org.scalatest.{FlatSpec, Matchers}
 import eu.inn.binders._
