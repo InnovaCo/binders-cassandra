@@ -84,7 +84,7 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
   }
 
   "cql...execute " should " be able to execute with parameters " in {
-    await(cql"delete from users where userid=?".bindParameter(0, 12).execute())
+    await(cql"delete from users where userid=?".bindNext(12).execute())
   }
 
   "cql...execute " should " be able to execute with 2 primitive parameters " in {

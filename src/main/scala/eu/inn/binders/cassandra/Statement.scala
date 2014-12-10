@@ -19,7 +19,13 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
   extends eu.inn.binders.core.Serializer[C] {
   import scala.collection.JavaConversions._
 
-  private val logger = LoggerFactory.getLogger(getClass)
+  protected val logger = LoggerFactory.getLogger(getClass)
+  protected var argIndex = 0
+  protected def nextIndex() = {
+    val prev = argIndex
+    argIndex += 1
+    prev
+  }
 
   def execute(): Future[Rows[C]] = {
     if (logger.isTraceEnabled) {
@@ -43,12 +49,12 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
 
   def hasField(fieldName: String): Boolean = boundStatement.preparedStatement().getVariables.contains(fieldName)
 
-  def setString(index: Int, value: String) = boundStatement.setString(index, value)
+  def addString(value: String) = boundStatement.setString(nextIndex(), value)
 
-  def setNullableString(index: Int, value: Option[String]) = if (value.isDefined)
-    boundStatement.setString(index, value.get)
+  def addNullableString(value: Option[String]) = if (value.isDefined)
+    boundStatement.setString(nextIndex(), value.get)
   else
-    boundStatement.setString(index, null)
+    boundStatement.setString(nextIndex(), null)
 
   def setString(name: String, value: String) = boundStatement.setString(name, value)
 
@@ -57,139 +63,139 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
   else
     boundStatement.setString(name, null)
 
-  def setInt(index: Int, value: Int) = boundStatement.setInt(index, value)
+  def addInt(value: Int) = boundStatement.setInt(nextIndex(), value)
+
+  def addIntNullable(value: Option[Int]) = if (value.isDefined)
+    boundStatement.setInt(nextIndex(), value.get)
+  else
+    boundStatement.setBytesUnsafe(nextIndex(), null)
 
   def setInt(name: String, value: Int) = boundStatement.setInt(name, value)
-
-  def setIntNullable(index: Int, value: Option[Int]) = if (value.isDefined)
-    boundStatement.setInt(index, value.get)
-  else
-    boundStatement.setBytesUnsafe(index, null)
 
   def setIntNullable(name: String, value: Option[Int]) = if (value.isDefined)
     boundStatement.setInt(name, value.get)
   else
     boundStatement.setBytesUnsafe(name, null)
 
-  def setLong(index: Int, value: Long) = boundStatement.setLong(index, value)
+  def addLong(value: Long) = boundStatement.setLong(nextIndex(), value)
+
+  def addLongNullable(value: Option[Long]) = if (value.isDefined)
+    boundStatement.setLong(nextIndex(), value.get)
+  else
+    boundStatement.setBytesUnsafe(nextIndex(), null)
 
   def setLong(name: String, value: Long) = boundStatement.setLong(name, value)
-
-  def setLongNullable(index: Int, value: Option[Long]) = if (value.isDefined)
-    boundStatement.setLong(index, value.get)
-  else
-    boundStatement.setBytesUnsafe(index, null)
 
   def setLongNullable(name: String, value: Option[Long]) = if (value.isDefined)
     boundStatement.setLong(name, value.get)
   else
     boundStatement.setBytesUnsafe(name, null)
 
-  def setDate(index: Int, value: Date) = boundStatement.setDate(index, value)
+  def addDate(value: Date) = boundStatement.setDate(nextIndex(), value)
 
   def setDate(name: String, value: Date) = boundStatement.setDate(name, value)
 
-  def setDateNullable(index: Int, value: Option[Date]) = boundStatement.setDate(index, value.orNull)
+  def addDateNullable(value: Option[Date]) = boundStatement.setDate(nextIndex(), value.orNull)
 
   def setDateNullable(name: String, value: Option[Date]) = boundStatement.setDate(name, value.orNull)
 
-  def setBoolean(index: Int, value: Boolean) = boundStatement.setBool(index, value)
+  def addBoolean(value: Boolean) = boundStatement.setBool(nextIndex(), value)
 
   def setBoolean(name: String, value: Boolean) = boundStatement.setBool(name, value)
 
-  def setBooleanNullable(index: Int, value: Option[Boolean]) = if (value.isDefined)
-    boundStatement.setBool(index, value.get)
+  def addBooleanNullable(value: Option[Boolean]) = if (value.isDefined)
+    boundStatement.setBool(nextIndex(), value.get)
   else
-    boundStatement.setBytesUnsafe(index, null)
+    boundStatement.setBytesUnsafe(nextIndex(), null)
 
   def setBooleanNullable(name: String, value: Option[Boolean]) = if (value.isDefined)
     boundStatement.setBool(name, value.get)
   else
     boundStatement.setBytesUnsafe(name, null)
 
-  def setFloat(index: Int, value: Float) = boundStatement.setFloat(index, value)
+  def addFloat(value: Float) = boundStatement.setFloat(nextIndex(), value)
 
   def setFloat(name: String, value: Float) = boundStatement.setFloat(name, value)
 
-  def setFloatNullable(index: Int, value: Option[Float]) = if (value.isDefined)
-    boundStatement.setFloat(index, value.get)
+  def addFloatNullable(value: Option[Float]) = if (value.isDefined)
+    boundStatement.setFloat(nextIndex(), value.get)
   else
-    boundStatement.setBytesUnsafe(index, null)
+    boundStatement.setBytesUnsafe(nextIndex(), null)
 
   def setFloatNullable(name: String, value: Option[Float]) = if (value.isDefined)
     boundStatement.setFloat(name, value.get)
   else
     boundStatement.setBytesUnsafe(name, null)
 
-  def setDouble(index: Int, value: Double) = boundStatement.setDouble(index, value)
+  def addDouble(value: Double) = boundStatement.setDouble(nextIndex(), value)
 
   def setDouble(name: String, value: Double) = boundStatement.setDouble(name, value)
 
-  def setDoubleNullable(index: Int, value: Option[Double]) = if (value.isDefined)
-    boundStatement.setDouble(index, value.get)
+  def addDoubleNullable(value: Option[Double]) = if (value.isDefined)
+    boundStatement.setDouble(nextIndex(), value.get)
   else
-    boundStatement.setBytesUnsafe(index, null)
+    boundStatement.setBytesUnsafe(nextIndex(), null)
 
   def setDoubleNullable(name: String, value: Option[Double]) = if (value.isDefined)
     boundStatement.setDouble(name, value.get)
   else
     boundStatement.setBytesUnsafe(name, null)
 
-  def setBytes(index: Int, value: ByteBuffer) = boundStatement.setBytes(index, value)
+  def addBytes(value: ByteBuffer) = boundStatement.setBytes(nextIndex(), value)
 
   def setBytes(name: String, value: ByteBuffer) = boundStatement.setBytes(name, value)
 
-  def setBytesNullable(index: Int, value: Option[ByteBuffer]) = boundStatement.setBytes(index, value.orNull)
+  def addBytesNullable(value: Option[ByteBuffer]) = boundStatement.setBytes(nextIndex(), value.orNull)
 
   def setBytesNullable(name: String, value: Option[ByteBuffer]) = boundStatement.setBytes(name, value.orNull)
 
-  def setBigInteger(index: Int, value: BigInteger) = boundStatement.setVarint(index, value)
+  def addBigInteger(value: BigInteger) = boundStatement.setVarint(nextIndex(), value)
 
   def setBigInteger(name: String, value: BigInteger) = boundStatement.setVarint(name, value)
 
-  def setBigIntegerNullable(index: Int, value: Option[BigInteger]) = boundStatement.setVarint(index, value.orNull)
+  def addBigIntegerNullable(value: Option[BigInteger]) = boundStatement.setVarint(nextIndex(), value.orNull)
 
   def setBigIntegerNullable(name: String, value: Option[BigInteger]) = boundStatement.setVarint(name, value.orNull)
 
-  def setBigDecimal(index: Int, value: BigDecimal) = boundStatement.setDecimal(index, value.bigDecimal)
+  def addBigDecimal(value: BigDecimal) = boundStatement.setDecimal(nextIndex(), value.bigDecimal)
 
   def setBigDecimal(name: String, value: BigDecimal) = boundStatement.setDecimal(name, value.bigDecimal)
 
-  def setBigDecimalNullable(index: Int, value: Option[BigDecimal]) = if (value.isDefined)
-    boundStatement.setDecimal(index, value.get.bigDecimal)
+  def addBigDecimalNullable(value: Option[BigDecimal]) = if (value.isDefined)
+    boundStatement.setDecimal(nextIndex(), value.get.bigDecimal)
   else
-    boundStatement.setDecimal(index, null)
+    boundStatement.setDecimal(nextIndex(), null)
 
   def setBigDecimalNullable(name: String, value: Option[BigDecimal]) = if (value.isDefined)
     boundStatement.setDecimal(name, value.get.bigDecimal)
   else
     boundStatement.setDecimal(name, null)
 
-  def setUUID(index: Int, value: UUID) = boundStatement.setUUID(index, value)
+  def addUUID(value: UUID) = boundStatement.setUUID(nextIndex(), value)
 
   def setUUID(name: String, value: UUID) = boundStatement.setUUID(name, value)
 
-  def setUUIDNullable(index: Int, value: Option[UUID]) = boundStatement.setUUID(index, value.orNull)
+  def addUUIDNullable(value: Option[UUID]) = boundStatement.setUUID(nextIndex(), value.orNull)
 
   def setUUIDNullable(name: String, value: Option[UUID]) = boundStatement.setUUID(name, value.orNull)
 
-  def setInetAddress(index: Int, value: InetAddress) = boundStatement.setInet(index, value)
+  def addInetAddress(value: InetAddress) = boundStatement.setInet(nextIndex(), value)
 
   def setInetAddress(name: String, value: InetAddress) = boundStatement.setInet(name, value)
 
-  def setInetAddressNullable(index: Int, value: Option[InetAddress]) = boundStatement.setInet(index, value.orNull)
+  def addInetAddressNullable(value: Option[InetAddress]) = boundStatement.setInet(nextIndex(), value.orNull)
 
   def setInetAddressNullable(name: String, value: Option[InetAddress]) = boundStatement.setInet(name, value.orNull)
 
-  def setList[T: ClassTag](index: Int, value: List[T]) = boundStatement.setList(index, value)
+  def addList[T: ClassTag](value: List[T]) = boundStatement.setList(nextIndex(), value)
 
   def setList[T: ClassTag](name: String, value: List[T]) = boundStatement.setList(name, value)
 
-  def setSet[T: ClassTag](index: Int, value: Set[T]) = boundStatement.setSet(index, value)
+  def addSet[T: ClassTag](value: Set[T]) = boundStatement.setSet(nextIndex(), value)
 
   def setSet[T: ClassTag](name: String, value: Set[T]) = boundStatement.setSet(name, value)
 
-  def setMap[K: ClassTag, V: ClassTag](index: Int, value: Map[K, V]) = boundStatement.setMap(index, value)
+  def addMap[K: ClassTag, V: ClassTag](value: Map[K, V]) = boundStatement.setMap(nextIndex(), value)
 
   def setMap[K: ClassTag, V: ClassTag](name: String, value: Map[K, V]) = boundStatement.setMap(name, value)
 }
