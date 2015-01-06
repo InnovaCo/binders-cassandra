@@ -23,7 +23,7 @@ class TestRowSpec extends FlatSpec with Matchers with MockitoSugar with CustomMo
   }
 
   case class TestInt(i1: Int, i2: Option[Int], i3: Option[Int])
-
+/*
   "Row " should " unbind int fields " in {
     val cr = row("i1", "i2", "i3")
     when(cr.isNull("i1")).thenReturn(false)
@@ -217,7 +217,7 @@ class TestRowSpec extends FlatSpec with Matchers with MockitoSugar with CustomMo
     val t = br.unbind[TestInetAddress]
     assert(t == TestInetAddress(InetAddress.getLocalHost, Some(InetAddress.getLoopbackAddress), None))
   }
-
+*/
   case class TestList(i1: List[Int], i2: List[String], i3: List[Date])
 
   "Row " should " unbind list fields " in {
@@ -242,7 +242,7 @@ class TestRowSpec extends FlatSpec with Matchers with MockitoSugar with CustomMo
   "Row " should " unbind set fields " in {
     import scala.collection.JavaConversions._
 
-    val cr = mock[com.datastax.driver.core.Row]
+    val cr = row("i1", "i2", "i3")
     when(cr.isNull("i1")).thenReturn(false)
     when(cr.getSet[Int]("i1", classOf[Int])).thenReturn(Set(1, 2, 3))
     when(cr.isNull("i2")).thenReturn(false)
@@ -251,8 +251,8 @@ class TestRowSpec extends FlatSpec with Matchers with MockitoSugar with CustomMo
     when(cr.getSet[Date]("i3", classOf[Date])).thenReturn(Set(yesterday, now))
 
     val br = new eu.inn.binders.cassandra.Row[PlainConverter](cr)
-    // todo: val t = br.unbind[TestSet]
-    // assert(t == TestSet(Set(1, 2, 3), Set("1", "2", "3"), Set(yesterday, now)))
+    val t = br.unbind[TestSet]
+    assert(t == TestSet(Set(1, 2, 3), Set("1", "2", "3"), Set(yesterday, now)))
   }
 
   case class TestMap(i1: Map[Int, String], i2: Map[Long, Date])
@@ -260,15 +260,15 @@ class TestRowSpec extends FlatSpec with Matchers with MockitoSugar with CustomMo
   "Row " should " unbind map fields " in {
     import scala.collection.JavaConversions._
 
-    val cr = mock[com.datastax.driver.core.Row]
+    val cr = row("i1", "i2")
     when(cr.isNull("i1")).thenReturn(false)
     when(cr.getMap[Int, String]("i1", classOf[Int], classOf[String])).thenReturn(Map(1 -> "11", 2 -> "22"))
     when(cr.isNull("i2")).thenReturn(false)
     when(cr.getMap[Long, Date]("i2", classOf[Long], classOf[Date])).thenReturn(Map(0l -> yesterday, 1l -> now))
 
     val br = new eu.inn.binders.cassandra.Row[PlainConverter](cr)
-    // todo: val t = br.unbind[TestMap]
-    // assert(t == TestMap(Map(1 -> "11", 2 -> "22"), Map(0l -> yesterday, 1l -> now)))
+    val t = br.unbind[TestMap]
+    assert(t == TestMap(Map(1 -> "11", 2 -> "22"), Map(0l -> yesterday, 1l -> now)))
   }
 
 }
