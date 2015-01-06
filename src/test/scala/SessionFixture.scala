@@ -1,5 +1,5 @@
 import com.datastax.driver.core.{Host, Session, Cluster}
-import eu.inn.binders.naming.PlainConverter
+import eu.inn.binders.naming.{LowercaseConverter, PlainConverter}
 import java.util.Date
 import org.scalatest.{Suite, BeforeAndAfter}
 import eu.inn.binders.cassandra._
@@ -35,7 +35,7 @@ trait SessionFixture extends BeforeAndAfter {
   this: Suite =>
   var cluster: Cluster = null
   var session: Session = null
-  implicit var sessionQueryCache: SessionQueryCache[PlainConverter] = null
+  implicit var sessionQueryCache: SessionQueryCache[LowercaseConverter] = null
 
   val yesterday = {
     import java.util._
@@ -61,7 +61,7 @@ trait SessionFixture extends BeforeAndAfter {
     waiter.waitHostAdd()
 
     //Thread.sleep(100)
-    sessionQueryCache = new SessionQueryCache[PlainConverter](session)
+    sessionQueryCache = new SessionQueryCache[LowercaseConverter](session)
     createUser(10, "maga", yesterday)
     createUser(11, "alla", yesterday)
   }

@@ -1,6 +1,6 @@
 import com.datastax.driver.core.BatchStatement
 import eu.inn.binders.cassandra.Query
-import eu.inn.binders.naming.PlainConverter
+import eu.inn.binders.naming.{LowercaseConverter, PlainConverter}
 import org.scalatest.{FlatSpec, Matchers}
 import eu.inn.binders._
 
@@ -27,45 +27,43 @@ class TestQuerySpec extends FlatSpec with Matchers with SessionFixture {
 
   "Query " should " be able to select one row " in {
 
-    val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid=10").createStatement()
-    val user = await(stmt.execute()).unbindOne[User]
+    val stmt = new Query[LowercaseConverter](session, "select userId,name,created from users where userid=10").createStatement()
+    val user = await(stmt.execute()).unbind[Seq[User]].head
 
-    assert(user.isDefined)
-    assert(user.get.userId == 10)
-    assert(user.get.name == "maga")
+    assert(user.userId == 10)
+    assert(user.name == "maga")
     //assert(user.get.created == yesterday)
   }
 
   "Query " should " be able to select one row with parameters " in {
 
-    val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid=?").createStatement()
-    val user = await(stmt.bindArgs(11).execute).unbindOne[User]
+    val stmt = new Query[LowercaseConverter](session, "select userId,name,created from users where userid=?").createStatement()
+    val user = await(stmt.bindArgs(11).execute).unbind[Seq[User]].head
 
-    assert(user.isDefined)
-    assert(user.get.userId == 11)
-    assert(user.get.name == "alla")
+    assert(user.userId == 11)
+    assert(user.name == "alla")
     //assert(user.get.created == yesterday)
   }
 
   "Query " should " be able to select two rows with 2 plain parameters " in {
 
-    val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid in(?,?)").createStatement()
-    val users = await(stmt.bindArgs(10, 11).execute).unbindAll[User].toSeq
+    val stmt = new Query[LowercaseConverter](session, "select userId,name,created from users where userid in(?,?)").createStatement()
+    val users = await(stmt.bindArgs(10, 11).execute).unbind[Seq[User]]
     assert(users.length == 2)
   }
 
   "Query " should " be able to select rows " in {
 
-    val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid in (10,11)").createStatement()
-    val users = await(stmt.execute()).unbindAll[User]
+    val stmt = new Query[LowercaseConverter](session, "select userId,name,created from users where userid in (10,11)").createStatement()
+    val users = await(stmt.execute()).unbind[Seq[User]]
 
     assert(users.length == 2)
   }
 
   "Query " should " be able to select 0 rows " in {
 
-    val stmt = new Query[PlainConverter](session, "select userId,name,created from users where userid in (12,13)").createStatement()
-    val users = await(stmt.execute()).unbindAll[User]
+    val stmt = new Query[LowercaseConverter](session, "select userId,name,created from users where userid in (12,13)").createStatement()
+    val users = await(stmt.execute()).unbind[Seq[User]]
 
     assert(users.length == 0)
   }

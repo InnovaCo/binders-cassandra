@@ -60,20 +60,16 @@ object CqlMacro {
   (c: Context)
     (executor: c.Expr[ExecutionContext]): c.Expr[Future[O]] = {
     import c.universe._
-
-    val apply = Apply(
-      Select(
-        // rows.unbindOne[O]
-        TypeApply(
-          Select(Ident(newTermName("rows")), newTermName("unbindOne")),
-          List(Ident(weakTypeOf[O].typeSymbol))
-        ),
-        newTermName("getOrElse")
-      ),
-      throwNoRows[O](c)
-    )
-
-    val tree = executeAndMap[S, O](c)(apply)
+    val tpe = weakTypeOf[O].typeSymbol
+    val tree = q"""{
+      val t = ${c.prefix.tree}
+      t.stmt.execute.map { rows =>
+        rows.unbind[Seq[$tpe]].headOption.getOrElse {
+          throw new NoRowsSelectedException(${tpe.fullName})
+        }
+      }
+    }"""
+    // println(tree)
     c.Expr[Future[O]](tree)
   }
 
@@ -81,42 +77,18 @@ object CqlMacro {
   (c: Context)
   (executor: c.Expr[ExecutionContext]): c.Expr[Future[IfApplied[O]]] = {
     import c.universe._
-
-    val appliedCondition = Select(Ident(newTermName("rows")), newTermName("wasApplied"))
-    val appliedRowExistsCondition = Apply(Select(Apply(Select(
-      Apply(Select(Select(Ident(newTermName("rows")), newTermName("resultSet")),newTermName("getColumnDefinitions")), List()),
-      newTermName("size")), List()),
-      newTermName("$greater")), List(Literal(Constant(1))))
-
-    val apply = If(appliedCondition,
-      Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
-        newTermName("Applied")),
-
-      If(appliedRowExistsCondition,
-        Apply(Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
-          newTermName("NotAppliedExists")),
-          List(
-            // rows.unbindOne[O].getOrElse(throw)
-            Apply(
-              Select(
-                // rows.unbindOne[O]
-                TypeApply(
-                  Select(Ident(newTermName("rows")), newTermName("unbindOne")),
-                  List(Ident(weakTypeOf[O].typeSymbol))
-                ),
-                newTermName("getOrElse")
-              ),
-              throwNoRows[O](c)
-            )
-          )
-        ),
-        Select(Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
-          newTermName("NotApplied"))
-      )
-    )
-
-    val tree = executeAndMap[S, O](c)(apply)
-    //println(tree)
+    val tpe = weakTypeOf[O].typeSymbol
+    val tree = q"""{
+      val t = ${c.prefix.tree}
+      t.stmt.execute.map { rows =>
+        eu.inn.binders.cassandra.internal.Helpers.checkIfApplied[$tpe](
+          rows,
+          ${tpe.fullName},
+          () => rows.unbind[Seq[$tpe]].headOption
+        )
+      }
+    }"""
+    // println(tree)
     c.Expr[Future[IfApplied[O]]](tree)
   }
 
@@ -125,14 +97,11 @@ object CqlMacro {
     (executor: c.Expr[ExecutionContext]): c.Expr[Future[Option[O]]] = {
     import c.universe._
 
-    // rows.unbindOne[O]
-    val apply =
-      TypeApply(
-        Select(Ident(newTermName("rows")), newTermName("unbindOne")),
-        List(Ident(weakTypeOf[O].typeSymbol))
-      )
-
-    val tree = executeAndMap[S, O](c)(apply)
+    val tree = q"""{
+      val t = ${c.prefix.tree}
+      t.stmt.execute.map(rows => rows.unbind[Seq[${weakTypeOf[O].typeSymbol}]].headOption)
+    }"""
+    // println(tree)
     c.Expr[Future[Option[O]]](tree)
   }
 
@@ -141,39 +110,12 @@ object CqlMacro {
     (executor: c.Expr[ExecutionContext]): c.Expr[Future[Iterator[O]]] = {
     import c.universe._
 
-    // rows.unbindAll[O]
-    val apply =
-      TypeApply(
-        Select(Ident(newTermName("rows")), newTermName("unbindAll")),
-        List(Ident(weakTypeOf[O].typeSymbol))
-      )
-
-    val tree = executeAndMap[S, O](c)(apply)
+    val tree = q"""{
+      val t = ${c.prefix.tree}
+      t.stmt.execute.map(rows => rows.unbind[Iterator[${weakTypeOf[O].typeSymbol}]])
+    }"""
+    // println(tree)
     c.Expr[Future[Iterator[O]]](tree)
-  }
-
-  private def executeAndMap[S: c.WeakTypeTag, O: c.WeakTypeTag](c: Context)(map: c.universe.Tree): c.universe.Tree = {
-    import c.universe._
-
-    val stmtTerm = newTermName(c.fresh("$stmt"))
-    val stmtVal = ValDef(Modifiers(), stmtTerm, TypeTree(), Select(c.prefix.tree, newTermName("stmt")))
-
-    val mapCall = Apply(
-      //stmt.execute.map(
-      Select(Select(Ident(stmtTerm), newTermName("execute")), newTermName("map")),
-      List(
-        Function(
-          // rows =>
-          List(ValDef(Modifiers(Flag.PARAM), newTermName("rows"), TypeTree(), EmptyTree)),
-          map
-        )
-      )
-    )
-
-    val vals = List(stmtVal)
-    val block = Block(vals, mapCall)
-    // println(block)
-    block
   }
 
   private def getQueryCode[C <: Converter : c.WeakTypeTag]
@@ -241,18 +183,5 @@ object CqlMacro {
 
     val queryString = strings.mkString("?")
     (Literal(Constant(queryString)), List())
-  }
-
-  private def throwNoRows[O: c.WeakTypeTag](c: Context): List[c.Tree] = {
-    import c.universe._
-    List(Throw(Apply(Select(New(
-      Select(
-        Select(Select(Select(Ident(newTermName("eu")), newTermName("inn")), newTermName("binders")), newTermName("cassandra")),
-        newTypeName("NoRowsSelectedException")
-      )
-    ),
-      nme.CONSTRUCTOR),
-      List(Literal(Constant(weakTypeOf[O].typeSymbol.fullName)))
-    )))
   }
 }
