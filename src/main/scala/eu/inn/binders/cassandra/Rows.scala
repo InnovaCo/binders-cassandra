@@ -12,6 +12,8 @@ class Rows[C <: Converter : TypeTag](val resultSet: ResultSet) extends eu.inn.bi
 
   def fieldName: Option[String] = None
 
+  def isNull = false
+
   def iterator(): Iterator[Row[C]] = resultSet.iterator().map(r => new Row[C](r))
 
   def wasApplied: Boolean = resultSet.wasApplied()

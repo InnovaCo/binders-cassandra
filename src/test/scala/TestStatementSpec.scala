@@ -1,4 +1,4 @@
-import eu.inn.binders.naming.PlainConverter
+import eu.inn.binders.naming.{Converter, PlainConverter}
 import java.math.BigInteger
 import java.net.InetAddress
 import java.nio.ByteBuffer
@@ -28,7 +28,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setInt("i1", 10)
     verify(cr).setInt("i2", 20)
-    verify(cr).setBytesUnsafe("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind int parameters " in {
@@ -39,7 +39,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setInt(0, 10)
     verify(cr).setInt(1, 20)
-    verify(cr).setBytesUnsafe(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestLong(i1: Long, i2: Option[Long], i3: Option[Long])
@@ -52,7 +52,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setLong("i1", 10)
     verify(cr).setLong("i2", 20)
-    verify(cr).setBytesUnsafe("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind long parameters " in {
@@ -63,7 +63,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setLong(0, 10l)
     verify(cr).setLong(1, 20l)
-    verify(cr).setBytesUnsafe(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestString(i1: String, i2: Option[String], i3: Option[String], i4: Option[String])
@@ -72,24 +72,24 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3", "i4")
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bind(TestString("10", Some("20"), None, Some(null)))
+    br.bind(TestString("10", Some("20"), None, Option(null)))
 
     verify(cr).setString("i1", "10")
     verify(cr).setString("i2", "20")
-    verify(cr).setString("i3", null)
-    verify(cr).setString("i4", null)
+    verify(cr).setToNull("i3")
+    verify(cr).setToNull("i4")
   }
 
   "Row " should " bind string parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3", "i4")
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindArgs("10", Some("20"), None.asInstanceOf[Option[String]], Some(null.asInstanceOf[String]))
+    br.bindArgs("10", Some("20"), None.asInstanceOf[Option[String]], Option(null.asInstanceOf[String]))
 
     verify(cr).setString(0, "10")
     verify(cr).setString(1, "20")
-    verify(cr).setString(2, null)
-    verify(cr).setString(3, null)
+    verify(cr).setToNull(2)
+    verify(cr).setToNull(3)
   }
 
   case class TestDate(i1: Date, i2: Option[Date], i3: Option[Date])
@@ -102,7 +102,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setDate("i1", yesterday)
     verify(cr).setDate("i2", now)
-    verify(cr).setDate("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind date parameters " in {
@@ -126,7 +126,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setBool("i1", true)
     verify(cr).setBool("i2", false)
-    verify(cr).setBytesUnsafe("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind boolean parameters " in {
@@ -137,7 +137,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setBool(0, true)
     verify(cr).setBool(1, false)
-    verify(cr).setBytesUnsafe(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestFloat(i1: Float, i2: Option[Float], i3: Option[Float])
@@ -150,7 +150,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setFloat("i1", 1.0f)
     verify(cr).setFloat("i2", 2.0f)
-    verify(cr).setBytesUnsafe("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind float parameters " in {
@@ -161,7 +161,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setFloat(0, 1.0f)
     verify(cr).setFloat(1, 2.0f)
-    verify(cr).setBytesUnsafe(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestDouble(i1: Double, i2: Option[Double], i3: Option[Double])
@@ -174,7 +174,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setDouble("i1", 1.0)
     verify(cr).setDouble("i2", 2.0)
-    verify(cr).setBytesUnsafe("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind double parameters " in {
@@ -185,7 +185,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setDouble(0, 1.0)
     verify(cr).setDouble(1, 2.0)
-    verify(cr).setBytesUnsafe(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestBytes(i1: ByteBuffer, i2: Option[ByteBuffer], i3: Option[ByteBuffer])
@@ -198,18 +198,18 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setBytes("i1", ByteBuffer.wrap(Array[Byte](1, 2, 3)))
     verify(cr).setBytes("i2", ByteBuffer.wrap(Array[Byte](5, 6, 7)))
-    verify(cr).setBytes("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind ByteBuffer parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindArgs(ByteBuffer.wrap(Array[Byte](1, 2, 3)), Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))), null.asInstanceOf[ByteBuffer])
+    br.bindArgs(ByteBuffer.wrap(Array[Byte](1, 2, 3)), Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))), Option(null.asInstanceOf[ByteBuffer]))
 
     verify(cr).setBytes(0, ByteBuffer.wrap(Array[Byte](1, 2, 3)))
     verify(cr).setBytes(1, ByteBuffer.wrap(Array[Byte](5, 6, 7)))
-    verify(cr).setBytes(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestBigInteger(i1: BigInteger, i2: Option[BigInteger], i3: Option[BigInteger])
@@ -222,18 +222,18 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setVarint("i1", new BigInteger("123"))
     verify(cr).setVarint("i2", new BigInteger("567"))
-    verify(cr).setVarint("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind BigInteger parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
-    br.bindArgs(new BigInteger("123"), new BigInteger("567"), null.asInstanceOf[BigInteger])
+    br.bindArgs(new BigInteger("123"), new BigInteger("567"), Option(null.asInstanceOf[BigInteger]))
 
     verify(cr).setVarint(0, new BigInteger("123"))
     verify(cr).setVarint(1, new BigInteger("567"))
-    verify(cr).setVarint(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestBigDecimal(i1: BigDecimal, i2: Option[BigDecimal], i3: Option[BigDecimal])
@@ -246,7 +246,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setDecimal("i1", BigDecimal("123").bigDecimal)
     verify(cr).setDecimal("i2", BigDecimal("567").bigDecimal)
-    verify(cr).setDecimal("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind BigDecimal parameters " in {
@@ -257,7 +257,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setDecimal(0, BigDecimal("123").bigDecimal)
     verify(cr).setDecimal(1, BigDecimal("567").bigDecimal)
-    verify(cr).setDecimal(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestUUID(i1: UUID, i2: Option[UUID], i3: Option[UUID])
@@ -272,7 +272,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setUUID("i1", uuid1)
     verify(cr).setUUID("i2", uuid2)
-    verify(cr).setUUID("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind UUID parameters " in {
@@ -285,7 +285,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setUUID(0, uuid1)
     verify(cr).setUUID(1, uuid2)
-    verify(cr).setUUID(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestInetAddress(i1: InetAddress, i2: Option[InetAddress], i3: Option[InetAddress])
@@ -298,7 +298,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setInet("i1", InetAddress.getLocalHost)
     verify(cr).setInet("i2", InetAddress.getLoopbackAddress)
-    verify(cr).setInet("i3", null)
+    verify(cr).setToNull("i3")
   }
 
   "Row " should " bind InetAddress parameters " in {
@@ -309,7 +309,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
     verify(cr).setInet(0, InetAddress.getLocalHost)
     verify(cr).setInet(1, InetAddress.getLoopbackAddress)
-    verify(cr).setInet(2, null)
+    verify(cr).setToNull(2)
   }
 
   case class TestList(i1: List[Int], i2: List[String], i3: List[Date])
