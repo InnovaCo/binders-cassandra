@@ -25,7 +25,7 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
 
   override def execute(): Future[Rows[C]] = {
     if (logger.isTraceEnabled) {
-      logger.trace(boundStatement.preparedStatement.getQueryString)
+      logger.trace(boundStatement.preparedStatement.getQueryString.trim)
     }
 
     val promise = Promise[Rows[C]]()
