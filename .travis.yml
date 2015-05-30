@@ -1,5 +1,6 @@
 language: scala
 scala:
-- 2.11.4
-- 2.10.4
-
+- 2.11.6
+env:
+  global:
+script: "$TRAVIS_BUILD_DIR/travis/build.sh"

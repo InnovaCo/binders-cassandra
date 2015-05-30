@@ -1,39 +1,21 @@
 import com.datastax.driver.core.{Host, Session, Cluster}
 import eu.inn.binders.naming.{LowercaseConverter, PlainConverter}
 import java.util.Date
+import org.cassandraunit.CassandraCQLUnit
+import org.cassandraunit.dataset.cql.ClassPathCQLDataSet
 import org.scalatest.{Suite, BeforeAndAfter}
 import eu.inn.binders.cassandra._
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
-class StateListener extends Host.StateListener {
-
-  val event = new Object
-  @volatile var isHostAdded: Boolean = false
-
-  def waitHostAdd() = {
-    event.synchronized {
-      while (!isHostAdded)
-        event.wait()
-    }
+object Cassandra extends CassandraCQLUnit(new ClassPathCQLDataSet("bindersTest.cql","binders_test")) {
+  lazy val start = {
+    before()
   }
-
-  override def onAdd(p1: Host): Unit = {
-    event.synchronized{
-      isHostAdded = true
-      event.notifyAll()
-    }
-  }
-
-  override def onSuspected(p1: Host): Unit = {}
-  override def onRemove(p1: Host): Unit = {}
-  override def onUp(p1: Host): Unit = {}
-  override def onDown(p1: Host): Unit = {}
 }
 
 trait SessionFixture extends BeforeAndAfter {
   this: Suite =>
-  var cluster: Cluster = null
   var session: Session = null
   implicit var sessionQueryCache: SessionQueryCache[LowercaseConverter] = null
 
@@ -54,27 +36,15 @@ trait SessionFixture extends BeforeAndAfter {
   }
 
   before {
-    cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
-    val waiter = new StateListener
-    cluster.register(waiter)
-    session = cluster.connect("binder_test")
-    waiter.waitHostAdd()
-
-    //Thread.sleep(100)
+    Cassandra.start
+    session = Cassandra.session
     sessionQueryCache = new SessionQueryCache[LowercaseConverter](session)
     createUser(10, "maga", yesterday)
     createUser(11, "alla", yesterday)
   }
 
   after {
-    if (session != null) {
-      session.close()
-      session = null
-    }
-    if (cluster != null) {
-      cluster.close()
-      cluster = null
-    }
+    //EmbeddedCassandraServerHelper.cleanEmbeddedCassandra()
     sessionQueryCache = null
   }
 

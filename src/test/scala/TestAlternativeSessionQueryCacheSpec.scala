@@ -1,12 +1,10 @@
-import java.util.concurrent.Callable
-
 import com.datastax.driver.core._
-import com.google.common.cache.{CacheBuilder, Cache}
 import eu.inn.binders.cassandra._
-import eu.inn.binders.naming.{SnakeCaseToCamelCaseConverter, Converter, PlainConverter}
+import eu.inn.binders.naming.{Converter, SnakeCaseToCamelCaseConverter}
 import org.scalatest.{FlatSpec, Matchers}
+
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.reflect.runtime.universe._
 
 
@@ -26,13 +24,9 @@ class AlternativeStatement[C <: Converter : TypeTag](session: Session, boundStat
 }
 
 class TestAlternativeSessionQueryCacheSpec extends FlatSpec with Matchers {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   "cql... " should " allow to use alternative SessionQueryCache implementation " in {
-    val cluster = Cluster.builder().addContactPoint("127.0.0.1").build()
-    val session = cluster.connect("binder_test")
-    implicit var sessionQueryCache = new AlternativeSessionQueryCache[SnakeCaseToCamelCaseConverter](session)
+    Cassandra.start
+    implicit var sessionQueryCache = new AlternativeSessionQueryCache[SnakeCaseToCamelCaseConverter](Cassandra.session)
     val userCql = cql"select userId,name,created from users where userid=1".execute()
     Await.result(userCql, 20 seconds)
   }
