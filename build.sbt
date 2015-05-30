@@ -1,6 +1,6 @@
 name := "binders-cassandra"
 
-version := "0.4-SNAPSHOT"
+version := "0.6"
 
 organization := "eu.inn"
 
@@ -16,7 +16,7 @@ libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
 libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.5"
 
-libraryDependencies += "eu.inn" %% "binders-core" % "0.4.10"
+libraryDependencies += "eu.inn" %% "binders-core" % "0.6.54"
 
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
 

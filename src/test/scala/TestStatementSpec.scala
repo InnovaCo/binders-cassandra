@@ -1,4 +1,4 @@
-import eu.inn.binders.naming.{Converter, PlainConverter}
+import eu.inn.binders.naming.{PlainConverter}
 import java.math.BigInteger
 import java.net.InetAddress
 import java.nio.ByteBuffer
@@ -6,7 +6,6 @@ import java.util.{UUID, Date}
 import org.scalatest.{FlatSpec, Matchers}
 import eu.inn.binders._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar.mock
 
 class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
 
@@ -48,6 +47,7 @@ class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
     val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
+
     br.bind(TestLong(10l, Some(20l), None))
 
     verify(cr).setLong("i1", 10)
