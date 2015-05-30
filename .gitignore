@@ -16,3 +16,7 @@ project/plugins/project/
 
 # OS X
 .DS_Store
+
+inn-oss-private.asc
+inn-oss-public.asc
+

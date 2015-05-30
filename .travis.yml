@@ -3,4 +3,8 @@ scala:
 - 2.11.6
 env:
   global:
+  - secure: ic9PsqXuUctKI9p6TNeL7zOFWUe+yQ9B9VpjbFoaAjVfJ19IpGuKdB8oKt/Aka+SE49H69y3FPC+7VhE64YFvvy7pmCkbUxpZsJNS2fWiTNAdBQ/GzQEXJw8BG+VNjWGg41aRWjyciDcxj5cPZ5YOzRp9wsqXXRtKmty7ObHK0M=
+  - secure: 5ELRefCftn+rmuLPtVSczrA/KDKOYsm3idH3p4ByOAz4pMs7Ukxb5PY32wwTGsc7aJeJcjaKdPf51FHROf9P0Tw0h7uSoUogxT4qCqh3y4SHV7hLi5inlicDJNrpvUPDWB42h+O3CrGPZYjXv1diDityG21ZHHwov0IrNQkcKc0=
+  - secure: 1Y+cTlYuJmnIMci3xIaaH4b/EVvI4TnQN5Xpx5b7CZav98ybWDrV+XpCuOO5U5/iWMwcxkw3pfgA6s84ELVsvfAWON9/yV+LmXsn9zU5crJ5xjOMQoMfLJTacHkFnqJTxOgTK+6VPcNiz97JT9TKSG3uqhKugdhPellheKzrYFw=
+  - secure: Fs58zaouU3u4SNfmcJ9X3gwnAWGCzZeuejpiaZ27iN3Bj/NixUY1mTSDP8O5FOqQB9VrAN+Jp9JVYsdi/hixT341N3DOKnQaPdTejEma9M5MMI8P7b/ATgm5fd+iwjVENuujLz7xXiN/E+of9+y503siXYgmeZfAzHr6TkmpTI0=
 script: "$TRAVIS_BUILD_DIR/travis/build.sh"
