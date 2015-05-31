@@ -10,11 +10,11 @@ import eu.inn.binders.naming.Converter
 
 package object cassandra {
 
-  implicit class CqlContext(val sc: StringContext) {
+  implicit class CqlContext(val sc: StringContext) extends AnyVal {
     def cql[C <: Converter : SessionQueryCache](args: Any*): Statement[C] = macro CqlMacro.cql[C]
   }
 
-  implicit class StatementOps[S <: Statement[_]](val stmt: S) {
+  implicit class StatementOps[S <: Statement[_]](val stmt: S) extends AnyVal {
     def one[O](implicit executor: ExecutionContext): Future[O] = macro CqlMacro.one[S, O]
 
     def oneApplied[O](implicit executor: ExecutionContext): Future[IfApplied[O]] = macro CqlMacro.oneApplied[S, O]
