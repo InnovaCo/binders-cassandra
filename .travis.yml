@@ -1,7 +1,7 @@
 language: scala
 scala:
-- 2.11.6
-- 2.10.4
+- 2.11.7
+- 2.10.5
 env:
   global:
   - secure: ic9PsqXuUctKI9p6TNeL7zOFWUe+yQ9B9VpjbFoaAjVfJ19IpGuKdB8oKt/Aka+SE49H69y3FPC+7VhE64YFvvy7pmCkbUxpZsJNS2fWiTNAdBQ/GzQEXJw8BG+VNjWGg41aRWjyciDcxj5cPZ5YOzRp9wsqXXRtKmty7ObHK0M=
