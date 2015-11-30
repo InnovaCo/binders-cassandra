@@ -14,7 +14,7 @@ resolvers ++= Seq(
 
 libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
-libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.5"
+libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.9"
 
 libraryDependencies += "eu.inn" %% "binders-core" % "0.10.70"
 
