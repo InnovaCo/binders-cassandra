@@ -55,6 +55,11 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
     this
   }
 
+  def withTimestamp(timestamp: Long): Statement[C] = {
+    boundStatement.setDefaultTimestamp(timestamp)
+    this
+  }
+
   private class FutureConverter(promise: Promise[Rows[C]]) extends FutureCallback[ResultSet] {
     override def onFailure(t: Throwable) {
       promise.failure(t)
