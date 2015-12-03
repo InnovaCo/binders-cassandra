@@ -8,7 +8,7 @@ import scala.concurrent.{Promise, Future}
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
-import com.datastax.driver.core.{ResultSet, Session, BoundStatement}
+import com.datastax.driver.core.{ConsistencyLevel, ResultSet, Session, BoundStatement}
 import com.google.common.util.concurrent.{FutureCallback, Futures}
 import org.slf4j.LoggerFactory
 
@@ -34,6 +34,30 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
     val promise = Promise[Rows[C]]()
     Futures.addCallback(session.executeAsync(boundStatement), new FutureConverter(promise))
     promise.future
+  }
+
+  def asNonIdempotent(): Statement[C] = {
+    boundStatement.setIdempotent(false)
+    this
+  }
+
+  def asIdempotent(): Statement[C] = {
+    boundStatement.setIdempotent(true)
+    this
+  }
+
+  def withConsistency(consistency: ConsistencyLevel): Statement[C] = {
+    if (consistency != ConsistencyLevel.LOCAL_SERIAL && consistency != ConsistencyLevel.SERIAL) {
+      boundStatement.setConsistencyLevel(consistency)
+    } else {
+      boundStatement.setSerialConsistencyLevel(consistency)
+    }
+    this
+  }
+
+  def withTimestamp(timestamp: Long): Statement[C] = {
+    boundStatement.setDefaultTimestamp(timestamp)
+    this
   }
 
   private class FutureConverter(promise: Promise[Rows[C]]) extends FutureCallback[ResultSet] {
