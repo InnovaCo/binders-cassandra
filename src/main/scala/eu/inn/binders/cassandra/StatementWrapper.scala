@@ -3,7 +3,7 @@ package eu.inn.binders.cassandra
 import scala.concurrent.{Promise, Future}
 import scala.reflect.runtime.universe._
 
-import com.datastax.driver.core.{Statement, ResultSet, BoundStatement, Session}
+import com.datastax.driver.core._
 import com.google.common.util.concurrent.{FutureCallback, Futures}
 import org.slf4j.LoggerFactory
 
@@ -24,6 +24,30 @@ abstract class StatementWrapper[C <: Converter : TypeTag, S <: Statement](val se
     val promise = Promise[Rows[C]]()
     Futures.addCallback(session.executeAsync(statement), new FutureConverter(promise))
     promise.future
+  }
+
+  def asNonIdempotent(): StatementWrapper[C, S] = {
+    statement.setIdempotent(false)
+    this
+  }
+
+  def asIdempotent(): StatementWrapper[C, S] = {
+    statement.setIdempotent(true)
+    this
+  }
+
+  def withConsistency(consistency: ConsistencyLevel): StatementWrapper[C, S] = {
+    if (consistency != ConsistencyLevel.LOCAL_SERIAL && consistency != ConsistencyLevel.SERIAL) {
+      statement.setConsistencyLevel(consistency)
+    } else {
+      statement.setSerialConsistencyLevel(consistency)
+    }
+    this
+  }
+
+  def withTimestamp(timestamp: Long): StatementWrapper[C, S] = {
+    statement.setDefaultTimestamp(timestamp)
+    this
   }
 
   protected def queryString(): String
