@@ -3,47 +3,22 @@ package eu.inn.binders.cassandra
 import java.math.BigInteger
 import java.net.InetAddress
 import java.nio.ByteBuffer
-import java.util.{UUID, Date}
-import scala.concurrent.{Promise, Future}
+import java.util.{Date, UUID}
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
-import com.datastax.driver.core.{ResultSet, Session, BoundStatement}
-import com.google.common.util.concurrent.{FutureCallback, Futures}
-import org.slf4j.LoggerFactory
+import com.datastax.driver.core.{BoundStatement, Session}
 
 import eu.inn.binders.naming.Converter
 
-class Statement[C <: Converter : TypeTag](val session: Session, val boundStatement: BoundStatement)
-  extends eu.inn.binders.core.Serializer[C] {
+class BoundStatementWrapper[C <: Converter : TypeTag](session: Session, val boundStatement: BoundStatement)
+  extends StatementWrapper[C, BoundStatement](session, boundStatement) with eu.inn.binders.core.Serializer[C] {
   import scala.collection.JavaConversions._
 
-  protected val logger = LoggerFactory.getLogger(getClass)
-  protected var argIndex = 0
+  protected var argIndex = -1
   protected def nextIndex() = {
-    val prev = argIndex
     argIndex += 1
-    prev
-  }
-
-  def execute(): Future[Rows[C]] = {
-    if (logger.isTraceEnabled) {
-      logger.trace(boundStatement.preparedStatement.getQueryString.trim)
-    }
-
-    val promise = Promise[Rows[C]]()
-    Futures.addCallback(session.executeAsync(boundStatement), new FutureConverter(promise))
-    promise.future
-  }
-
-  private class FutureConverter(promise: Promise[Rows[C]]) extends FutureCallback[ResultSet] {
-    override def onFailure(t: Throwable) {
-      promise.failure(t)
-    }
-
-    override def onSuccess(result: ResultSet) {
-      promise.success(new Rows(result))
-    }
+    argIndex
   }
 
   def fieldName: Option[String] = None
@@ -54,6 +29,9 @@ class Statement[C <: Converter : TypeTag](val session: Session, val boundStateme
     else
       None
   }
+
+
+  override protected def queryString(): String = boundStatement.preparedStatement().getQueryString
 
   def writeNull() = boundStatement.setToNull(nextIndex())
 

@@ -1,3 +1,7 @@
+import java.util.Date
+
+import scala.util.Random
+
 import com.datastax.driver.core.BatchStatement
 import eu.inn.binders.cassandra._
 import org.scalatest.{FlatSpec, Matchers}
@@ -185,6 +189,56 @@ class TestCqlSpec extends FlatSpec with Matchers with SessionFixture {
     val a = await(cql"update users set name = 'magomed' where userid=$userId if name='maga'".oneApplied[UserName])
     assert(a.isApplied)
   }
+
+  "batch...execute" should "execute one statement" in {
+    val user = User(userId = newId(), name = "test", created = new Date())
+    val a = await(batch(cql"insert into users(userId, name, created) values(?,?,?)".bindArgs(user.userId, user.name, user.created)).execute())
+    assert(a.wasApplied)
+    assert(a.resultSet.all().size() == 0)
+
+    val loadedUser = await(cql"SELECT * FROM users WHERE userId = ?".bindArgs(user.userId).one[User])
+    assert(loadedUser.userId == user.userId)
+    assert(loadedUser.name == user.name)
+  }
+
+  "batch...execute" should "execute several statements" in {
+    val user = User(userId = newId(), name = "test", created = new Date())
+    val user2 = User(userId = newId(), name = "test2", created = new Date())
+    val a = await(batch(
+      cql"insert into users(userId, name, created) values(?,?,?)".bindArgs(user.userId, user.name, user.created),
+      cql"insert into users(userId, name, created) values(?,?,?)".bindArgs(user2.userId, user2.name, user2.created)
+    ).execute())
+    assert(a.wasApplied)
+    assert(a.resultSet.all().size() == 0)
+  }
+
+  "batch...oneApplied" should "execute insert with LWT for non-exists record" in {
+    val user = User(userId = newId(), name = "test", created = new Date())
+    val a = await(batch(
+      cql"insert into users(userId, name, created) values(?,?,?) IF NOT EXISTS".bindArgs(user.userId, user.name, user.created)
+    ).oneApplied[User])
+
+    assert(a.isApplied)
+    assert(a.result.isEmpty)
+  }
+
+  "batch...oneApplied" should "execute insert with LWT for exists record" in {
+    val user = User(userId = newId(), name = "test", created = new Date())
+    createUser(user.userId, name = user.name, created = user.created)
+    val a = await(batch(
+      cql"insert into users(userId, name, created) values(?,?,?) IF NOT EXISTS".bindArgs(user.userId, user.name, user.created)
+    ).oneApplied[User])
+
+    assert(!a.isApplied)
+    assert(a.result.exists { u ⇒
+      u.name == user.name &&
+      u.userId == user.userId
+    })
+  }
+
+  private def newId(): Int = Math.abs(Random.nextInt())
+
+
 
   /*
   this doesn't work, because :userId can't be set as a list
