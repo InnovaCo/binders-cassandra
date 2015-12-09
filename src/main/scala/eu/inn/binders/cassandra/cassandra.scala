@@ -28,20 +28,27 @@ package object cassandra {
 
   implicit def convertFutureToUnit[R <: Rows[_]](f: Future[R])(implicit executor: ExecutionContext): Future[Unit] = f.map(_ ⇒ {})
 
-  def batch[C  <: Converter : SessionQueryCache : TypeTag](wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
-    batchWithType[C](BatchStatement.Type.LOGGED, wrappers: _*)
-  }
+  object Batch {
 
-  def unloggedBatch[C  <: Converter : SessionQueryCache : TypeTag](wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
-    batchWithType[C](BatchStatement.Type.UNLOGGED, wrappers: _*)
-  }
+    def apply[C  <: Converter : SessionQueryCache : TypeTag](wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
+      logged(wrappers: _*)
+    }
 
-  def counterBatch[C  <: Converter : SessionQueryCache : TypeTag](wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
-    batchWithType[C](BatchStatement.Type.COUNTER, wrappers: _*)
-  }
+    def logged[C  <: Converter : SessionQueryCache : TypeTag](wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
+      batchWithType[C](BatchStatement.Type.LOGGED, wrappers: _*)
+    }
 
-  private def batchWithType[C  <: Converter : SessionQueryCache : TypeTag](batchType: BatchStatement.Type, wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
-    val statements = wrappers.map(_.boundStatement)
-    new BatchStatementWrapper[C](cache.session, batchType, statements: _*)
+    def unlogged[C  <: Converter : SessionQueryCache : TypeTag](wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
+      batchWithType[C](BatchStatement.Type.UNLOGGED, wrappers: _*)
+    }
+
+    def counter[C  <: Converter : SessionQueryCache : TypeTag](wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
+      batchWithType[C](BatchStatement.Type.COUNTER, wrappers: _*)
+    }
+
+    private def batchWithType[C  <: Converter : SessionQueryCache : TypeTag](batchType: BatchStatement.Type, wrappers: BoundStatementWrapper[_] *)(implicit cache: SessionQueryCache[_]): BatchStatementWrapper[C] = {
+      val statements = wrappers.map(_.boundStatement)
+      new BatchStatementWrapper[C](cache.session, batchType, statements: _*)
+    }
   }
 }
