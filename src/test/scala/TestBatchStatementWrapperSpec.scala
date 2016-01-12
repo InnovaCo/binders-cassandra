@@ -18,7 +18,7 @@ class TestBatchStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
 
   "BatchStatementWrapper" should "create and fill BatchStatement from plain statements" in {
     val statements = Seq(stmt("s1"), stmt("s2"))
-    val br = new eu.inn.binders.cassandra.BatchStatementWrapper[PlainConverter](session, BatchStatement.Type.LOGGED, statements: _*)
+    val br = new eu.inn.binders.cassandra.BatchStatement[PlainConverter](session, BatchStatement.Type.LOGGED, statements: _*)
     when(session.executeAsync(any(classOf[BatchStatement]))).thenReturn(mock[ResultSetFuture])
     br.execute()
 
@@ -37,7 +37,7 @@ class TestBatchStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
     val batchStatement = new BatchStatement(BatchStatement.Type.LOGGED)
     batchStatement.addAll(statementsInBatch)
 
-    val br = new eu.inn.binders.cassandra.BatchStatementWrapper[PlainConverter](session, BatchStatement.Type.LOGGED, batchStatement +: statements : _*)
+    val br = new eu.inn.binders.cassandra.BatchStatement[PlainConverter](session, BatchStatement.Type.LOGGED, batchStatement +: statements : _*)
     when(session.executeAsync(any(classOf[BatchStatement]))).thenReturn(mock[ResultSetFuture])
     br.execute()
 

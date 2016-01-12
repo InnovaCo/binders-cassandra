@@ -12,15 +12,15 @@ class AlternativeQuery[C <: Converter : TypeTag](session: Session, preparedState
   extends eu.inn.binders.cassandra.Query[C](session, preparedStatement) {
   def this(session: Session, queryString: String) = this(session, session.prepare(queryString))
 
-  override def createStatement(): eu.inn.binders.cassandra.BoundStatementWrapper[C] = new AlternativeBoundStatementWrapper[C](session, new BoundStatement(preparedStatement))
+  override def createStatement(): eu.inn.binders.cassandra.Statement[C] = new AlternativeStatement[C](session, new BoundStatement(preparedStatement))
 }
 
 class AlternativeSessionQueryCache[C <: Converter : TypeTag](session: Session) extends SessionQueryCache[C](session) {
   override protected def newQuery(query: String) = new AlternativeQuery[C](session, query)
 }
 
-class AlternativeBoundStatementWrapper[C <: Converter : TypeTag](session: Session, boundStatement: BoundStatement)
-  extends eu.inn.binders.cassandra.BoundStatementWrapper[C](session, boundStatement) {
+class AlternativeStatement[C <: Converter : TypeTag](session: Session, boundStatement: BoundStatement)
+  extends eu.inn.binders.cassandra.Statement[C](session, boundStatement) {
 }
 
 class TestAlternativeSessionQueryCacheSpec extends FlatSpec with Matchers {

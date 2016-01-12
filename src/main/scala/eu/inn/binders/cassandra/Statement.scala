@@ -11,8 +11,8 @@ import com.datastax.driver.core.{BoundStatement, Session}
 
 import eu.inn.binders.naming.Converter
 
-class BoundStatementWrapper[C <: Converter : TypeTag](session: Session, val boundStatement: BoundStatement)
-  extends StatementWrapper[C, BoundStatement](session, boundStatement) with eu.inn.binders.core.Serializer[C] {
+class Statement[C <: Converter : TypeTag](session: Session, val boundStatement: BoundStatement)
+  extends AbstractStatement[C, BoundStatement](session, boundStatement) with eu.inn.binders.core.Serializer[C] {
   import scala.collection.JavaConversions._
 
   protected var argIndex = -1

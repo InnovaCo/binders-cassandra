@@ -12,5 +12,5 @@ class Query[C <: Converter : TypeTag](val session: Session, val preparedStatemen
 
   def this(session: Session, queryString: String) = this(session, session.prepare(queryString))
 
-  def createStatement(): BoundStatementWrapper[C] = new BoundStatementWrapper[C](session, new BoundStatement(preparedStatement))
+  def createStatement(): Statement[C] = new Statement[C](session, new BoundStatement(preparedStatement))
 }

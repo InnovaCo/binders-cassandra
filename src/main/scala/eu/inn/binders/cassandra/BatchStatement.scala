@@ -2,12 +2,12 @@ package eu.inn.binders.cassandra
 
 import scala.reflect.runtime.universe._
 
-import com.datastax.driver.core._
+import com.datastax.driver.core.{BatchStatement ⇒ DriverBatchStatement, Statement ⇒ DriverStatement, _}
 
 import eu.inn.binders.naming.Converter
 
-class BatchStatementWrapper[C <: Converter : TypeTag](session: Session, val batchType: BatchStatement.Type, statements: Statement *)
-  extends StatementWrapper[C, BatchStatement](session, new BatchStatement(batchType)) {
+class BatchStatement[C <: Converter : TypeTag](session: Session, val batchType: DriverBatchStatement.Type, statements: DriverStatement *)
+  extends AbstractStatement[C, DriverBatchStatement](session, new DriverBatchStatement(batchType)) {
   import scala.collection.JavaConversions._
 
   statement.addAll(statements)

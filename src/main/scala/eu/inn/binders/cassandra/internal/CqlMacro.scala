@@ -5,7 +5,7 @@ import scala.language.experimental.macros
 import scala.language.reflectiveCalls
 import scala.reflect.macros.Context
 
-import eu.inn.binders.cassandra.{IfApplied, DynamicQuery, BoundStatementWrapper}
+import eu.inn.binders.cassandra.{IfApplied, DynamicQuery, Statement}
 import eu.inn.binders.naming.Converter
 
 
@@ -13,7 +13,7 @@ object CqlMacro {
   def cql[C <: Converter : c.WeakTypeTag]
   (c: Context)
     (args: c.Expr[Any]*)
-    (sessionQueryCache: c.Expr[eu.inn.binders.cassandra.SessionQueryCache[C]]): c.Expr[BoundStatementWrapper[C]] = {
+    (sessionQueryCache: c.Expr[eu.inn.binders.cassandra.SessionQueryCache[C]]): c.Expr[Statement[C]] = {
     import c.universe._
 
     // Extract and format CQL query string from StringContext (which is this)
@@ -53,7 +53,7 @@ object CqlMacro {
     )
 
     //println(block)
-    c.Expr[BoundStatementWrapper[C]](block)
+    c.Expr[Statement[C]](block)
   }
 
   def one[S: c.WeakTypeTag, O: c.WeakTypeTag]

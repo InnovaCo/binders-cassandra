@@ -22,7 +22,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind int fields " in {
     val cr = stmt("i1", "i2", "i3")
     val s = mock[com.datastax.driver.core.Session]
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestInt(10, Some(20), None))
 
     verify(cr).setInt("i1", 10)
@@ -33,7 +33,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind int parameters " in {
     val cr = stmt("i1", "i2")
     val s = mock[com.datastax.driver.core.Session]
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(10,Some(20),None.asInstanceOf[Option[Int]])
 
     verify(cr).setInt(0, 10)
@@ -46,7 +46,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind long fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
 
     br.bind(TestLong(10l, Some(20l), None))
 
@@ -58,7 +58,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind long parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(10l,Some(20l),None.asInstanceOf[Option[Long]])
 
     verify(cr).setLong(0, 10l)
@@ -71,7 +71,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind string fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3", "i4")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestString("10", Some("20"), None, Option(null)))
 
     verify(cr).setString("i1", "10")
@@ -83,7 +83,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind string parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3", "i4")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs("10", Some("20"), None.asInstanceOf[Option[String]], Option(null.asInstanceOf[String]))
 
     verify(cr).setString(0, "10")
@@ -97,7 +97,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind date fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestDate(yesterday, Some(now), None))
 
     verify(cr).setDate("i1", yesterday)
@@ -108,7 +108,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind date parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(yesterday, now, null.asInstanceOf[Date])
 
     verify(cr).setDate(0, yesterday)
@@ -121,7 +121,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind boolean fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestBoolean(true, Some(false), None))
 
     verify(cr).setBool("i1", true)
@@ -132,7 +132,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind boolean parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(true, false, None.asInstanceOf[Option[Boolean]])
 
     verify(cr).setBool(0, true)
@@ -145,7 +145,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " nbind float fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestFloat(1.0f, Some(2.0f), None))
 
     verify(cr).setFloat("i1", 1.0f)
@@ -156,7 +156,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind float parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(1.0f, 2.0f, None.asInstanceOf[Option[Float]])
 
     verify(cr).setFloat(0, 1.0f)
@@ -169,7 +169,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind double fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestDouble(1.0, Some(2.0), None))
 
     verify(cr).setDouble("i1", 1.0)
@@ -180,7 +180,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind double parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(1.0, 2.0, None.asInstanceOf[Option[Double]])
 
     verify(cr).setDouble(0, 1.0)
@@ -193,7 +193,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind ByteBuffer fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestBytes(ByteBuffer.wrap(Array[Byte](1, 2, 3)), Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))), None))
 
     verify(cr).setBytes("i1", ByteBuffer.wrap(Array[Byte](1, 2, 3)))
@@ -204,7 +204,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind ByteBuffer parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(ByteBuffer.wrap(Array[Byte](1, 2, 3)), Some(ByteBuffer.wrap(Array[Byte](5, 6, 7))), Option(null.asInstanceOf[ByteBuffer]))
 
     verify(cr).setBytes(0, ByteBuffer.wrap(Array[Byte](1, 2, 3)))
@@ -217,7 +217,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " unbind BigInteger fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestBigInteger(new BigInteger("123"), Some(new BigInteger("567")), None))
 
     verify(cr).setVarint("i1", new BigInteger("123"))
@@ -228,7 +228,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind BigInteger parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(new BigInteger("123"), new BigInteger("567"), Option(null.asInstanceOf[BigInteger]))
 
     verify(cr).setVarint(0, new BigInteger("123"))
@@ -241,7 +241,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind BigDecimal fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestBigDecimal(BigDecimal("123"), Some(BigDecimal("567")), None))
 
     verify(cr).setDecimal("i1", BigDecimal("123").bigDecimal)
@@ -252,7 +252,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind BigDecimal parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(BigDecimal("123"), BigDecimal("567"), None.asInstanceOf[Option[BigDecimal]])
 
     verify(cr).setDecimal(0, BigDecimal("123").bigDecimal)
@@ -267,7 +267,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
     val uuid2 = UUID.randomUUID()
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestUUID(uuid1, Some(uuid2), None))
 
     verify(cr).setUUID("i1", uuid1)
@@ -280,7 +280,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
     val uuid2 = UUID.randomUUID()
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(uuid1, uuid2, None.asInstanceOf[Option[UUID]])
 
     verify(cr).setUUID(0, uuid1)
@@ -293,7 +293,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind InetAddress fields " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestInetAddress(InetAddress.getLocalHost, Some(InetAddress.getLoopbackAddress), None))
 
     verify(cr).setInet("i1", InetAddress.getLocalHost)
@@ -304,7 +304,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   "Row " should " bind InetAddress parameters " in {
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bindArgs(InetAddress.getLocalHost, Some(InetAddress.getLoopbackAddress), None.asInstanceOf[Option[InetAddress]])
 
     verify(cr).setInet(0, InetAddress.getLocalHost)
@@ -323,7 +323,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
 
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
 
     br.bind(TestList(lst1, lst2, lst3))
 
@@ -343,7 +343,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
 
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2", "i3")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestSet(set1, set2, set3))
 
     verify(cr).setSet("i1", set1)
@@ -361,7 +361,7 @@ class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
 
     val s = mock[com.datastax.driver.core.Session]
     val cr = stmt("i1", "i2")
-    val br = new eu.inn.binders.cassandra.BoundStatementWrapper[PlainConverter](s, cr)
+    val br = new eu.inn.binders.cassandra.Statement[PlainConverter](s, cr)
     br.bind(TestMap(map1, map2))
 
     verify(cr).setMap("i1", map1)
