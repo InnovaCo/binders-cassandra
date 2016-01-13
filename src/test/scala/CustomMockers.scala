@@ -1,4 +1,7 @@
 import com.datastax.driver.core.{DataType, ColumnDefinitions}
+import org.hamcrest.{Description, BaseMatcher}
+import org.mockito.{ArgumentMatcher, Matchers}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 
@@ -34,4 +37,12 @@ trait CustomMockers extends MockitoSugar {
     when(mr.preparedStatement()).thenReturn(mp)
     mr
   }
+
+  def argMatch[T](f: T ⇒ Any) = argThat(new ArgumentMatcher[T] {
+
+    override def matches(arg: scala.Any): Boolean = {
+      f(arg.asInstanceOf[T])
+      true
+    }
+  })
 }

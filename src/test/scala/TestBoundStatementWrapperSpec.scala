@@ -7,7 +7,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import eu.inn.binders._
 import org.mockito.Mockito._
 
-class TestStatementSpec extends FlatSpec with Matchers with CustomMockers {
+class TestBoundStatementWrapperSpec extends FlatSpec with Matchers with CustomMockers {
 
   val (yesterday, now) = {
     import java.util._

@@ -1,8 +1,10 @@
 package eu.inn.binders
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.experimental.macros
+import scala.reflect.runtime.universe._
 
-import language.experimental.macros
+import com.datastax.driver.core.{BatchStatement ⇒ DriverBatchStatement}
 
 import eu.inn.binders.cassandra.internal.CqlMacro
 import eu.inn.binders.naming.Converter
@@ -14,7 +16,7 @@ package object cassandra {
     def cql[C <: Converter : SessionQueryCache](args: Any*): Statement[C] = macro CqlMacro.cql[C]
   }
 
-  implicit class StatementOps[S <: Statement[_]](val stmt: S) extends AnyVal {
+  implicit class StatementOps[S <: AbstractStatement[_, _]](val stmt: S) extends AnyVal {
     def one[O](implicit executor: ExecutionContext): Future[O] = macro CqlMacro.one[S, O]
 
     def oneApplied[O](implicit executor: ExecutionContext): Future[IfApplied[O]] = macro CqlMacro.oneApplied[S, O]
@@ -25,4 +27,28 @@ package object cassandra {
   }
 
   implicit def convertFutureToUnit[R <: Rows[_]](f: Future[R])(implicit executor: ExecutionContext): Future[Unit] = f.map(_ ⇒ {})
+
+  object Batch {
+
+    def apply[C  <: Converter : SessionQueryCache : TypeTag](wrappers: Statement[_] *)(implicit cache: SessionQueryCache[_]): BatchStatement[C] = {
+      logged(wrappers: _*)
+    }
+
+    def logged[C  <: Converter : SessionQueryCache : TypeTag](wrappers: Statement[_] *)(implicit cache: SessionQueryCache[_]): BatchStatement[C] = {
+      batchWithType[C](DriverBatchStatement.Type.LOGGED, wrappers: _*)
+    }
+
+    def unlogged[C  <: Converter : SessionQueryCache : TypeTag](wrappers: Statement[_] *)(implicit cache: SessionQueryCache[_]): BatchStatement[C] = {
+      batchWithType[C](DriverBatchStatement.Type.UNLOGGED, wrappers: _*)
+    }
+
+    def counter[C  <: Converter : SessionQueryCache : TypeTag](wrappers: Statement[_] *)(implicit cache: SessionQueryCache[_]): BatchStatement[C] = {
+      batchWithType[C](DriverBatchStatement.Type.COUNTER, wrappers: _*)
+    }
+
+    private def batchWithType[C  <: Converter : SessionQueryCache : TypeTag](batchType: DriverBatchStatement.Type, wrappers: Statement[_] *)(implicit cache: SessionQueryCache[_]): BatchStatement[C] = {
+      val statements = wrappers.map(_.boundStatement)
+      new BatchStatement[C](cache.session, batchType, statements: _*)
+    }
+  }
 }
