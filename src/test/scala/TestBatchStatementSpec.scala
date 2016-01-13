@@ -8,7 +8,7 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import scala.collection.JavaConversions._
 
-class TestBatchStatementWrapperSpec extends FlatSpec with Matchers with CustomMockers with BeforeAndAfter {
+class TestBatchStatementSpec extends FlatSpec with Matchers with CustomMockers with BeforeAndAfter {
 
   val session = mock[com.datastax.driver.core.Session]
 
@@ -16,7 +16,7 @@ class TestBatchStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
     org.mockito.Mockito.reset(session)
   }
 
-  "BatchStatementWrapper" should "create and fill BatchStatement from plain statements" in {
+  "BatchStatement" should "create and fill BatchStatement from plain statements" in {
     val statements = Seq(stmt("s1"), stmt("s2"))
     val br = new eu.inn.binders.cassandra.BatchStatement[PlainConverter](session, BatchStatement.Type.LOGGED, statements: _*)
     when(session.executeAsync(any(classOf[BatchStatement]))).thenReturn(mock[ResultSetFuture])
@@ -30,7 +30,7 @@ class TestBatchStatementWrapperSpec extends FlatSpec with Matchers with CustomMo
   }
 
 
-  "BatchStatementWrapper" should "flatten and add statements from BatchStatement" in {
+  "BatchStatement" should "flatten and add statements from BatchStatement" in {
     val statements = Seq(stmt("s1"), stmt("s2"))
     val statementsInBatch = Seq(stmt("b1"), stmt("b2"))
 
