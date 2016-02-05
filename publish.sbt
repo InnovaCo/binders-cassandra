@@ -11,9 +11,7 @@ publishTo := {
 
 publishArtifact in Test := false
 
-pomIncludeRepository := {
-  _ => false
-}
+pomIncludeRepository := { _ => false}
 
 pomExtra := {
   <url>https://github.com/InnovaCo/binders-cassandra</url>
