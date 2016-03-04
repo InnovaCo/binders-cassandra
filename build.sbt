@@ -16,7 +16,7 @@ libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
 libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.9"
 
-libraryDependencies += "eu.inn" %% "binders-core" % "0.11.75"
+libraryDependencies += "eu.inn" %% "binders-core" % "0.11.77"
 
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
 
