@@ -12,23 +12,18 @@ resolvers ++= Seq(
     Resolver.sonatypeRepo("public")
   )
 
-libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test"
+libraryDependencies ++= Seq(
+  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.9",
+  "com.google.guava" % "guava" % "19.0",
+  "eu.inn" %% "binders-core" % "0.11.77",
+  "org.slf4j" % "slf4j-api" % "1.7.7",
+  "org.mockito" % "mockito-all" % "1.10.19" % "test",
+  "org.scalatest" %% "scalatest" % "2.2.1" % "test",
+  "org.cassandraunit" % "cassandra-unit" % "2.1.3.1" % "test",
+  "junit" % "junit" % "4.12" % "test"
+)
 
-libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.9"
-
-libraryDependencies += "eu.inn" %% "binders-core" % "0.11.77"
-
-libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
-
-libraryDependencies += "com.google.guava" % "guava" % "18.0"
-
-libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.7"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
-
-libraryDependencies += "org.cassandraunit" % "cassandra-unit" % "2.1.3.1" % "test"
-
-libraryDependencies += "junit" % "junit" % "4.12" % "test"
+//libraryDependencies += "com.google.code.findbugs" % "jsr305" % "1.3.+"
 
 libraryDependencies := {
   CrossVersion.partialVersion(scalaVersion.value) match {
