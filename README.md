@@ -1,5 +1,9 @@
 # binders-cassandra
 
+[![Build Status](https://travis-ci.org/InnovaCo/binders-cassandra.svg?branch=master)](https://travis-ci.org/InnovaCo/binders-cassandra)
+
+[ Latest Releases ](https://oss.sonatype.org/#nexus-search;gav~eu.inn~binders-cassandra_*~~~)
+
 This is a data binder library for Cassandra written in Scala. Please see more information at [binders library page](https://github.com/InnovaCo/binders)
 
 Cassandra data using [DataStax Java Driver for Cassandra](https://github.com/datastax/java-driver).
