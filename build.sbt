@@ -15,7 +15,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.9",
   "com.google.guava" % "guava" % "19.0",
-  "eu.inn" %% "binders-core" % "0.12.85",
+  "eu.inn" %% "binders-core" % "0.12.93",
   "org.slf4j" % "slf4j-api" % "1.7.7",
   "org.mockito" % "mockito-all" % "1.10.19" % "test",
   "org.scalatest" %% "scalatest" % "2.2.6" % "test",
