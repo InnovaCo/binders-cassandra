@@ -22,5 +22,4 @@ class SessionQueryCache[C <: Converter : TypeTag](val session: Session) {
   private class Loader(query: String) extends Callable[Query[C]] {
     override def call(): Query[C] = newQuery(query)
   }
-
 }

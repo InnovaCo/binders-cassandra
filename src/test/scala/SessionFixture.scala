@@ -8,7 +8,7 @@ import eu.inn.binders.cassandra._
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
-object Cassandra extends CassandraCQLUnit(new ClassPathCQLDataSet("bindersTest.cql","binders_test")) {
+object Cassandra extends CassandraCQLUnit(new ClassPathCQLDataSet("bindersTest.cql","binders_test"), null, "127.0.0.1", 9142, 60000) {
   lazy val start = {
     before()
   }
