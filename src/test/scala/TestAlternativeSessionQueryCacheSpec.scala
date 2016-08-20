@@ -15,7 +15,7 @@ class AlternativeQuery[C <: Converter : TypeTag](session: Session, preparedState
   override def createStatement(): eu.inn.binders.cassandra.Statement[C] = new AlternativeStatement[C](session, new BoundStatement(preparedStatement))
 }
 
-class AlternativeSessionQueryCache[C <: Converter : TypeTag](session: Session) extends SessionQueryCache[C](session) {
+class AlternativeSessionQueryCache[C <: Converter : TypeTag](session: Session) extends GuavaSessionQueryCache[C](session) {
   override protected def newQuery(query: String) = new AlternativeQuery[C](session, query)
 }
 

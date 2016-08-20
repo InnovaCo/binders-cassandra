@@ -1,12 +1,14 @@
-import com.datastax.driver.core.{Host, Session, Cluster}
-import eu.inn.binders.naming.{LowercaseConverter, PlainConverter}
 import java.util.Date
+
+import com.datastax.driver.core.Session
+import eu.inn.binders.cassandra._
+import eu.inn.binders.naming.LowercaseConverter
 import org.cassandraunit.CassandraCQLUnit
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet
-import org.scalatest.{Suite, BeforeAndAfter}
-import eu.inn.binders.cassandra._
-import scala.concurrent.{Future, Await}
+import org.scalatest.{BeforeAndAfter, Suite}
+
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 object Cassandra extends CassandraCQLUnit(new ClassPathCQLDataSet("bindersTest.cql","binders_test"), null, "127.0.0.1", 9142, 60000) {
   lazy val start = {
@@ -38,7 +40,7 @@ trait SessionFixture extends BeforeAndAfter {
   before {
     Cassandra.start
     session = Cassandra.session
-    sessionQueryCache = new SessionQueryCache[LowercaseConverter](session)
+    sessionQueryCache = new GuavaSessionQueryCache[LowercaseConverter](session)
     createUser(10, "maga", yesterday)
     createUser(11, "alla", yesterday)
   }
