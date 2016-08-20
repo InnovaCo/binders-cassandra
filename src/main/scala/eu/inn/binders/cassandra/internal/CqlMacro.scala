@@ -150,7 +150,7 @@ object CqlMacro {
 
     val argsIterator = args.iterator
     val appendCalls =
-      strings.map { s =>
+      strings.flatMap { s =>
         if (argsIterator.hasNext) {
           val stringContextArg = argsIterator.next()
           if (stringContextArg.actualType <:< typeOf[DynamicQuery]) {
@@ -171,7 +171,7 @@ object CqlMacro {
         else {
           List(Apply(Select(Ident(sbTerm), newTermName("append")), List(Literal(Constant(s)))))
         }
-      }.flatten
+      }
 
     (Apply(Select(Ident(sbTerm), newTermName("toString")), List()), List(sbVal) ++ appendCalls)
   }
